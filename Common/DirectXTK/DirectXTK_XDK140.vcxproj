@@ -1,0 +1,539 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Durango">
+      <Configuration>Debug</Configuration>
+      <Platform>Durango</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Profile|Durango">
+      <Configuration>Profile</Configuration>
+      <Platform>Durango</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Profile|x64">
+      <Configuration>Profile</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Durango">
+      <Configuration>Release</Configuration>
+      <Platform>Durango</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ApplicationEnvironment>title</ApplicationEnvironment>
+    <RootNamespace>DirectXTK140</RootNamespace>
+    <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and '$(VisualStudioVersion)' == ''">$(VCTargetsPath11)</VCTargetsPath>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <ProjectGuid>{371B9FA9-4C90-4AC6-A123-ACED756D6C77}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Durango'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|Durango'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Durango'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\Samples.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir>$(SampleLibDir)</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Durango'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)XboxOne</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|Durango'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)XboxOnei</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)PC</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)PCi</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Durango'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)XboxOned</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)PCd</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Durango'">
+    <Link>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <ClCompile>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WINAPI_FAMILY=WINAPI_FAMILY_TV_TITLE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>.\Inc;.\Src</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Lib />
+    <Lib />
+    <CustomBuildStep>
+      <Command />
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs />
+    </CustomBuildStep>
+    <Lib>
+      <AdditionalOptions>/ignore:4264 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile|Durango'">
+    <Link>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <ClCompile>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WINAPI_FAMILY=WINAPI_FAMILY_TV_TITLE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>.\Inc;.\Src</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Lib />
+    <Lib />
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>
+      </Outputs>
+    </CustomBuildStep>
+    <Lib>
+      <AdditionalOptions>/ignore:4264 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Link>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OpenMPSupport>true</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>.\Inc;.\Src</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Lib />
+    <Lib />
+    <CustomBuildStep>
+      <Command />
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs />
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">
+    <Link>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OpenMPSupport>true</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>.\Inc;.\Src</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Lib />
+    <Lib />
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>
+      </Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Durango'">
+    <Link>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <ClCompile>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <Optimization>Disabled</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PreprocessorDefinitions>WINAPI_FAMILY=WINAPI_FAMILY_TV_TITLE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>.\Inc;.\Src</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Lib />
+    <Lib />
+    <CustomBuildStep>
+      <Command />
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs />
+    </CustomBuildStep>
+    <Lib>
+      <AdditionalOptions>/ignore:4264 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Link>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PreprocessorDefinitions>_DEBUG;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OpenMPSupport>true</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>.\Inc;.\Src</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Lib />
+    <Lib />
+    <CustomBuildStep>
+      <Command />
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs />
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Audio\SoundCommon.h" />
+    <ClInclude Include="Audio\WaveBankReader.h" />
+    <ClInclude Include="Audio\WAVFileReader.h" />
+    <ClInclude Include="Inc\Audio.h" />
+    <ClInclude Include="Inc\CommonStates.h" />
+    <ClInclude Include="Inc\DDSTextureLoader.h" />
+    <ClInclude Include="Inc\DirectXHelpers.h" />
+    <ClInclude Include="Inc\Effects.h" />
+    <ClInclude Include="Inc\GamePad.h" />
+    <ClInclude Include="Inc\GeometricPrimitive.h" />
+    <ClInclude Include="Inc\GraphicsMemory.h" />
+    <ClInclude Include="Inc\Keyboard.h" />
+    <ClInclude Include="Inc\Model.h" />
+    <ClInclude Include="Inc\Mouse.h" />
+    <ClInclude Include="Inc\PrimitiveBatch.h" />
+    <ClInclude Include="Inc\ScreenGrab.h" />
+    <ClInclude Include="Inc\SimpleMath.h" />
+    <ClInclude Include="Inc\SpriteBatch.h" />
+    <ClInclude Include="Inc\SpriteFont.h" />
+    <ClInclude Include="Inc\VertexTypes.h" />
+    <ClInclude Include="Inc\WICTextureLoader.h" />
+    <ClInclude Include="Inc\XboxDDSTextureLoader.h" />
+    <ClInclude Include="Src\AlignedNew.h" />
+    <ClInclude Include="Src\Bezier.h" />
+    <ClInclude Include="Src\BinaryReader.h" />
+    <ClInclude Include="Src\ConstantBuffer.h" />
+    <ClInclude Include="Src\dds.h" />
+    <ClInclude Include="Src\DemandCreate.h" />
+    <ClInclude Include="Src\EffectCommon.h" />
+    <ClInclude Include="Src\pch.h" />
+    <ClInclude Include="Src\PlatformHelpers.h" />
+    <ClInclude Include="Src\SharedResourcePool.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Inc\SimpleMath.inl" />
+    <None Include="Src\Shaders\Common.fxh" />
+    <None Include="Src\Shaders\Compiled\XboxOneAlphaTestEffect_PSAlphaTestEqNe.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneAlphaTestEffect_PSAlphaTestEqNeNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneAlphaTestEffect_PSAlphaTestLtGt.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneAlphaTestEffect_PSAlphaTestLtGtNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneAlphaTestEffect_VSAlphaTest.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneAlphaTestEffect_VSAlphaTestNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneAlphaTestEffect_VSAlphaTestVc.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneAlphaTestEffect_VSAlphaTestVcNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_PSBasic.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_PSBasicNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_PSBasicPixelLighting.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_PSBasicPixelLightingTx.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_PSBasicTx.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_PSBasicTxNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_PSBasicVertexLighting.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_PSBasicVertexLightingNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_PSBasicVertexLightingTx.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_PSBasicVertexLightingTxNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasic.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicOneLight.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicOneLightTx.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicOneLightTxVc.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicOneLightVc.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicPixelLighting.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicPixelLightingTx.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicPixelLightingTxVc.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicPixelLightingVc.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicTx.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicTxNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicTxVc.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicTxVcNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicVc.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicVcNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicVertexLighting.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicVertexLightingTx.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicVertexLightingTxVc.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneBasicEffect_VSBasicVertexLightingVc.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLEffect_main.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLEffect_main1Bones.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLEffect_main1BonesVc.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLEffect_main2Bones.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLEffect_main2BonesVc.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLEffect_main4Bones.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLEffect_main4BonesVc.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLEffect_mainVc.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLLambert_main.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLLambert_mainTk.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLLambert_mainTx.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLLambert_mainTxTk.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLPhong_main.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLPhong_mainTk.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLPhong_mainTx.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLPhong_mainTxTk.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLUnlit_main.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLUnlit_mainTk.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLUnlit_mainTx.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDGSLUnlit_mainTxTk.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDualTextureEffect_PSDualTexture.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDualTextureEffect_PSDualTextureNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDualTextureEffect_VSDualTexture.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDualTextureEffect_VSDualTextureNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDualTextureEffect_VSDualTextureVc.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneDualTextureEffect_VSDualTextureVcNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneEnvironmentMapEffect_PSEnvMap.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneEnvironmentMapEffect_PSEnvMapNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneEnvironmentMapEffect_PSEnvMapSpecular.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneEnvironmentMapEffect_PSEnvMapSpecularNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneEnvironmentMapEffect_VSEnvMap.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneEnvironmentMapEffect_VSEnvMapFresnel.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneEnvironmentMapEffect_VSEnvMapOneLight.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneEnvironmentMapEffect_VSEnvMapOneLightFresnel.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneSkinnedEffect_PSSkinnedPixelLighting.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneSkinnedEffect_PSSkinnedVertexLighting.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneSkinnedEffect_PSSkinnedVertexLightingNoFog.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneSkinnedEffect_VSSkinnedOneLightFourBones.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneSkinnedEffect_VSSkinnedOneLightOneBone.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneSkinnedEffect_VSSkinnedOneLightTwoBones.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneSkinnedEffect_VSSkinnedPixelLightingFourBones.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneSkinnedEffect_VSSkinnedPixelLightingOneBone.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneSkinnedEffect_VSSkinnedPixelLightingTwoBones.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneSkinnedEffect_VSSkinnedVertexLightingFourBones.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneSkinnedEffect_VSSkinnedVertexLightingOneBone.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneSkinnedEffect_VSSkinnedVertexLightingTwoBones.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneSpriteEffect_SpritePixelShader.inc" />
+    <None Include="Src\Shaders\Compiled\XboxOneSpriteEffect_SpriteVertexShader.inc" />
+    <None Include="Src\Shaders\CompileShaders.cmd" />
+    <None Include="Src\Shaders\Lighting.fxh" />
+    <None Include="Src\Shaders\Structures.fxh" />
+    <None Include="Src\TeapotData.inc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Audio\AudioEngine.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Audio\DynamicSoundEffectInstance.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Audio\SoundCommon.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Audio\SoundEffect.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Audio\SoundEffectInstance.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Audio\WaveBank.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Audio\WaveBankReader.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Audio\WAVFileReader.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Src\AlphaTestEffect.cpp" />
+    <ClCompile Include="Src\BasicEffect.cpp" />
+    <ClCompile Include="Src\BinaryReader.cpp" />
+    <ClCompile Include="Src\CommonStates.cpp" />
+    <ClCompile Include="Src\DDSTextureLoader.cpp" />
+    <ClCompile Include="Src\DGSLEffect.cpp" />
+    <ClCompile Include="Src\DGSLEffectFactory.cpp" />
+    <ClCompile Include="Src\DualTextureEffect.cpp" />
+    <ClCompile Include="Src\EffectCommon.cpp" />
+    <ClCompile Include="Src\EffectFactory.cpp" />
+    <ClCompile Include="Src\EnvironmentMapEffect.cpp" />
+    <ClCompile Include="Src\GamePad.cpp" />
+    <ClCompile Include="Src\GeometricPrimitive.cpp" />
+    <ClCompile Include="Src\GraphicsMemory.cpp" />
+    <ClCompile Include="Src\Keyboard.cpp" />
+    <ClCompile Include="Src\Model.cpp" />
+    <ClCompile Include="Src\ModelLoadCMO.cpp" />
+    <ClCompile Include="Src\ModelLoadSDKMESH.cpp" />
+    <ClCompile Include="Src\ModelLoadVBO.cpp" />
+    <ClCompile Include="Src\Mouse.cpp" />
+    <ClCompile Include="Src\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|Durango'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Durango'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Durango'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Src\PrimitiveBatch.cpp" />
+    <ClCompile Include="Src\ScreenGrab.cpp" />
+    <ClCompile Include="Src\SimpleMath.cpp" />
+    <ClCompile Include="Src\SkinnedEffect.cpp" />
+    <ClCompile Include="Src\SpriteBatch.cpp" />
+    <ClCompile Include="Src\SpriteFont.cpp" />
+    <ClCompile Include="Src\VertexTypes.cpp" />
+    <ClCompile Include="Src\WICTextureLoader.cpp" />
+    <ClCompile Include="Src\XboxDDSTextureLoader.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|Durango'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Durango'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Durango'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Src\Shaders\AlphaTestEffect.fx">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Src\Shaders\BasicEffect.fx">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Src\Shaders\DGSLEffect.fx">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Src\Shaders\DGSLLambert.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Src\Shaders\DGSLPhong.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Src\Shaders\DGSLUnlit.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Src\Shaders\DualTextureEffect.fx">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Src\Shaders\EnvironmentMapEffect.fx">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Src\Shaders\SkinnedEffect.fx">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Src\Shaders\SpriteEffect.fx">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

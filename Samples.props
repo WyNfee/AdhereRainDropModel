@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- common defines -->
+  <ImportGroup Label="PropertySheets">
+    <Import Project="SamplesCommon.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+
+  <!-- XboxOne -->
+    <Import Project="SamplesXboxOne.props" Condition="'$(Configuration)|$(Platform)'=='Debug|Durango'" />
+    <Import Project="SamplesXboxOne.props" Condition="'$(Configuration)|$(Platform)'=='Profile|Durango'" />
+    <Import Project="SamplesXboxOne.props" Condition="'$(Configuration)|$(Platform)'=='Release|Durango'" />
+    <Import Project="SamplesXboxOne.props" Condition="'$(Configuration)|$(Platform)'=='Debug12|Durango'" />
+    <Import Project="SamplesXboxOne.props" Condition="'$(Configuration)|$(Platform)'=='Profile12|Durango'" />
+    <Import Project="SamplesXboxOne.props" Condition="'$(Configuration)|$(Platform)'=='Release12|Durango'" />
+  <!-- PC -->
+    <Import Project="SamplesPC.props" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"  />
+    <Import Project="SamplesPC.props" Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <Import Project="SamplesPC.props" Condition="'$(Configuration)|$(Platform)'=='Profile|x64'"  />
+    <Import Project="SamplesPC.props" Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'"  />
+    <Import Project="SamplesPC.props" Condition="'$(Configuration)|$(Platform)'=='Release12|x64'" />
+    <Import Project="SamplesPC.props" Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'"  />
+  </ImportGroup>
+</Project>

@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <!-- define environment variables we rely on -->
+  <PropertyGroup Label="UserMacros">
+    <SampleRoot>$(MSBuildThisFileDirectory)\Common\</SampleRoot>
+    <SampleIncludeDir>$(MSBuildThisFileDirectory)\Common\</SampleIncludeDir>
+    <SampleLibDir>$(MSBuildThisFileDirectory)\Common\Lib\</SampleLibDir>
+    <SampleExtraLibDir></SampleExtraLibDir>
+    <SampleMediaDir>$(MSBuildThisFileDirectory)\Common\Lib\Media</SampleMediaDir>
+    <SampleExePath>$(Console_SdkRoot)\Bin</SampleExePath>
+    <FXC>fxc.exe /nologo</FXC>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- redirect intermediate dir to a toolchain dependent path so dev10 and dev11 don't clash -->
+    <IntDir>$(Platform)\$(Configuration)$(PlatformToolsetVersion)\obj\</IntDir>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)$(PlatformToolsetVersion)\bin\</OutDir>
+    <TargetName>$(ProjectName)$(Configuration)</TargetName>
+  </PropertyGroup>
+  <ItemGroup>
+    <BuildMacro Include="SampleLibDir">
+      <Value>$(SampleLibDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="SampleExtraLibDir">
+      <Value>$(SampleExtraLibDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="SampleIncludeDir">
+      <Value>$(SampleIncludeDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="SampleMediaDir">
+      <Value>$(SampleMediaDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

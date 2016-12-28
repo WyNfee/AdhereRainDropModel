@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <LayoutMediaDir>$(LayoutDir)Image\Loose\Media</LayoutMediaDir>
+    <PhSO>phso.exe</PhSO>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- make sure fxc can be found -->
+    <ReferencePath>$(Console_SdkLibPath);$(Console_SdkWindowsMetadataPath)</ReferencePath>
+    <LibraryPath>$(SampleLibDir);$(SampleExtraLibDir);$(Console_SdkLibPath)</LibraryPath>
+    <LibraryWPath>$(Console_SdkLibPath);$(Console_SdkWindowsMetadataPath)</LibraryWPath>
+    <IncludePath>$(SampleIncludeDir)\SampleFramework;$(SampleIncludeDir)\DirectXTK\inc;$(Console_SdkIncludeRoot)\um;$(Console_SdkIncludeRoot)\shared;$(Console_SdkIncludeRoot)\winrt</IncludePath>
+    <ExecutablePath>$(DurangoXdkTools);$(DurangoXdkInstallPath)bin;$(FXCToolPath);$(VCInstallDir)bin\x86_amd64;$(VCInstallDir)bin;$(WindowsSDK_ExecutablePath_x86);$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(MSBuildToolsPath32);$(FxCopDir);$(PATH)</ExecutablePath>
+    <NativeExecutablePath>$(DurangoXdkTools);$(DurangoXdkInstallPath)bin;$(FXCToolPath);$(NativeExecutablePath)</NativeExecutablePath>
+    <SlashAI>$(Console_SdkWindowsMetadataPath);$(VCInstallDir)vcpackages;$(AdditionalUsingDirectories)</SlashAI>
+    <RemoveExtraDeployFiles>true</RemoveExtraDeployFiles>
+    <IsolateConfigurationsOnDeploy>true</IsolateConfigurationsOnDeploy>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <CustomBuildStep>
+      <Inputs>MediaList.txt</Inputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <!-- common settings -->
+  <ItemDefinitionGroup Label="PropertySheets">
+    <ClCompile>
+      <CompileAsWinRT>true</CompileAsWinRT>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <ForcedIncludeFiles>$(ForcedInc)</ForcedIncludeFiles>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  
+  <!-- Release Durango config -->
+  <PropertyGroup Label="Configuration" />
+  <ItemGroup>
+    <BuildMacro Include="LayoutMediaDir">
+      <Value>$(LayoutMediaDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Durango'" Label="PropertySheets">
+    <ClCompile>
+      <AdditionalUsingDirectories>$(SlashAI)</AdditionalUsingDirectories>
+      <PreprocessorDefinitions>UNICODE;_UNICODE;NDEBUG;_XBOX_ONE;_DURANGO;__WRL_NO_DEFAULT_LIB__;WINAPI_FAMILY=WINAPI_FAMILY_TV_TITLE;WIN32_LEAN_AND_MEAN;_XM_F16C_INTRINSICS_;MIN_EXPECTED_XDK_VER=9343;MAX_EXPECTED_XDK_VER=0xffffffff;$(MSBUILD_CMDLINE_CPP_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>SampleFramework$(PlatformToolsetVersion)XboxOne.lib;DirectXTK_XDK$(PlatformToolsetVersion)XboxOne.lib;d3d11_x.lib;xg_x.lib;combase.lib;kernelx.lib;toolhelpx.lib;D3DCompiler.lib;dxguid.lib;etwplus.lib</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>kernel32.lib;oldnames.lib;runtimeobject.lib;ole32.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+    <Lib>
+      <AdditionalOptions>/ignore:4264 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+    <CustomBuildStep>
+      <Command>
+                call "$(SampleRoot)copymedia.bat" MediaList.txt "$(OutDir)Media" "$(SampleMediaDir)" "$(ProjectDir)Media"
+                echo CopyMediaDepFile &gt;&gt; "$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp"
+      </Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  
+  <!-- Debug Durango config -->
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Durango'" Label="PropertySheets">
+    <ClCompile>
+      <AdditionalUsingDirectories>$(SlashAI)</AdditionalUsingDirectories>
+      <PreprocessorDefinitions>UNICODE;_UNICODE;_DEBUG;DEBUG;_XBOX_ONE;_DURANGO;__WRL_NO_DEFAULT_LIB__;WINAPI_FAMILY=WINAPI_FAMILY_TV_TITLE;WIN32_LEAN_AND_MEAN;_XM_F16C_INTRINSICS_;MIN_EXPECTED_XDK_VER=9343;MAX_EXPECTED_XDK_VER=0xffffffff;$(MSBUILD_CMDLINE_CPP_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>SampleFramework$(PlatformToolsetVersion)XboxOned.lib;DirectXTK_XDK$(PlatformToolsetVersion)XboxOned.lib;d3d11_x.lib;xg_x.lib;combase.lib;kernelx.lib;toolhelpx.lib;D3DCompiler.lib;dxguid.lib;etwplus.lib</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>kernel32.lib;oldnames.lib;runtimeobject.lib;ole32.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+    <Lib>
+      <AdditionalOptions>/ignore:4264 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+    <CustomBuildStep>
+      <Command>
+                call "$(SampleRoot)copymedia.bat" MediaList.txt "$(LayoutMediaDir)" "$(SampleMediaDir)" "$(ProjectDir)Media"
+                echo CopyMediaDepFile &gt;&gt; "$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp"
+      </Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  
+  <!-- Profile Durango config -->
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile|Durango'" Label="PropertySheets">
+    <ClCompile>
+      <AdditionalUsingDirectories>$(SlashAI)</AdditionalUsingDirectories>
+      <PreprocessorDefinitions>PROFILE;UNICODE;_UNICODE;NDEBUG;_XBOX_ONE;_DURANGO;__WRL_NO_DEFAULT_LIB__;WINAPI_FAMILY=WINAPI_FAMILY_TV_TITLE;WIN32_LEAN_AND_MEAN;_XM_F16C_INTRINSICS_;MIN_EXPECTED_XDK_VER=9343;MAX_EXPECTED_XDK_VER=0xffffffff;$(MSBUILD_CMDLINE_CPP_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>SampleFramework$(PlatformToolsetVersion)XboxOnei.lib;DirectXTK_XDK$(PlatformToolsetVersion)XboxOnei.lib;d3d11_x.lib;xg_x.lib;combase.lib;kernelx.lib;toolhelpx.lib;D3DCompiler.lib;dxguid.lib;etwplus.lib</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>kernel32.lib;oldnames.lib;runtimeobject.lib;ole32.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+    <Lib>
+      <AdditionalOptions>/ignore:4264 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+    <CustomBuildStep>
+      <Command>
+                call "$(SampleRoot)copymedia.bat" MediaList.txt "$(OutDir)Media" "$(SampleMediaDir)" "$(ProjectDir)Media"
+                echo CopyMediaDepFile &gt;&gt; "$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp"
+      </Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  
+  <!-- Release12 Durango config -->
+  <PropertyGroup Label="Configuration" />
+  <ItemGroup>
+    <BuildMacro Include="LayoutMediaDir">
+      <Value>$(LayoutMediaDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release12|Durango'" Label="PropertySheets">
+    <ClCompile>
+      <AdditionalUsingDirectories>$(SlashAI)</AdditionalUsingDirectories>
+      <PreprocessorDefinitions>XSF_USE_DX_12_0;UNICODE;_UNICODE;NDEBUG;_XBOX_ONE;_DURANGO;__WRL_NO_DEFAULT_LIB__;WINAPI_FAMILY=WINAPI_FAMILY_TV_TITLE;WIN32_LEAN_AND_MEAN;_XM_F16C_INTRINSICS_;MIN_EXPECTED_XDK_VER=9343;MAX_EXPECTED_XDK_VER=0xffffffff;$(MSBUILD_CMDLINE_CPP_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>SampleFramework$(PlatformToolsetVersion)XboxOne12.lib;DirectXTK_XDK$(PlatformToolsetVersion)XboxOne.lib;d3d12_x.lib;xg_x.lib;combase.lib;kernelx.lib;toolhelpx.lib;D3DCompiler.lib;dxguid.lib;etwplus.lib</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>kernel32.lib;oldnames.lib;runtimeobject.lib;ole32.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+    <Lib>
+      <AdditionalOptions>/ignore:4264 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+    <CustomBuildStep>
+      <Command>
+                call "$(SampleRoot)copymedia.bat" MediaList.txt "$(OutDir)Media" "$(SampleMediaDir)" "$(ProjectDir)Media"
+                echo CopyMediaDepFile &gt;&gt; "$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp"
+      </Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  
+  <!-- Debug12 Durango config -->
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug12|Durango'" Label="PropertySheets">
+    <ClCompile>
+      <AdditionalUsingDirectories>$(SlashAI)</AdditionalUsingDirectories>
+      <PreprocessorDefinitions>XSF_USE_DX_12_0;UNICODE;_UNICODE;_DEBUG;DEBUG;_XBOX_ONE;_DURANGO;__WRL_NO_DEFAULT_LIB__;WINAPI_FAMILY=WINAPI_FAMILY_TV_TITLE;WIN32_LEAN_AND_MEAN;_XM_F16C_INTRINSICS_;MIN_EXPECTED_XDK_VER=9343;MAX_EXPECTED_XDK_VER=0xffffffff;$(MSBUILD_CMDLINE_CPP_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>SampleFramework$(PlatformToolsetVersion)XboxOne12d.lib;DirectXTK_XDK$(PlatformToolsetVersion)XboxOned.lib;d3d12_x.lib;xg_x.lib;combase.lib;kernelx.lib;toolhelpx.lib;D3DCompiler.lib;dxguid.lib;etwplus.lib</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>kernel32.lib;oldnames.lib;runtimeobject.lib;ole32.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+    <Lib>
+      <AdditionalOptions>/ignore:4264 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+    <CustomBuildStep>
+      <Command>
+                call "$(SampleRoot)copymedia.bat" MediaList.txt "$(LayoutMediaDir)" "$(SampleMediaDir)" "$(ProjectDir)Media"
+                echo CopyMediaDepFile &gt;&gt; "$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp"
+      </Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  
+  <!-- Profile12 Durango config -->
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile12|Durango'" Label="PropertySheets">
+    <ClCompile>
+      <AdditionalUsingDirectories>$(SlashAI)</AdditionalUsingDirectories>
+      <PreprocessorDefinitions>XSF_USE_DX_12_0;PROFILE;UNICODE;_UNICODE;NDEBUG;_XBOX_ONE;_DURANGO;__WRL_NO_DEFAULT_LIB__;WINAPI_FAMILY=WINAPI_FAMILY_TV_TITLE;WIN32_LEAN_AND_MEAN;_XM_F16C_INTRINSICS_;MIN_EXPECTED_XDK_VER=9343;MAX_EXPECTED_XDK_VER=0xffffffff;$(MSBUILD_CMDLINE_CPP_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>SampleFramework$(PlatformToolsetVersion)XboxOne12i.lib;DirectXTK_XDK$(PlatformToolsetVersion)XboxOnei.lib;d3d12_x.lib;xg_x.lib;combase.lib;kernelx.lib;toolhelpx.lib;D3DCompiler.lib;dxguid.lib;etwplus.lib</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>kernel32.lib;oldnames.lib;runtimeobject.lib;ole32.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+    <Lib>
+      <AdditionalOptions>/ignore:4264 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+    <CustomBuildStep>
+      <Command>
+                call "$(SampleRoot)copymedia.bat" MediaList.txt "$(OutDir)Media" "$(SampleMediaDir)" "$(ProjectDir)Media"
+                echo CopyMediaDepFile &gt;&gt; "$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp"
+      </Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  
+</Project>

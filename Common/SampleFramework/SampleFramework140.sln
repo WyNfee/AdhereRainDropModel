@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2015
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SampleFramework140", "SampleFramework140.vcxproj", "{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Durango = Debug|Durango
+		Debug|x64 = Debug|x64
+		Debug12|Durango = Debug12|Durango
+		Debug12|x64 = Debug12|x64
+		Profile|Durango = Profile|Durango
+		Profile|x64 = Profile|x64
+		Profile12|Durango = Profile12|Durango
+		Profile12|x64 = Profile12|x64
+		Release|Durango = Release|Durango
+		Release|x64 = Release|x64
+		Release12|Durango = Release12|Durango
+		Release12|x64 = Release12|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Debug|Durango.ActiveCfg = Debug|Durango
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Debug|Durango.Build.0 = Debug|Durango
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Debug|x64.ActiveCfg = Debug|x64
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Debug|x64.Build.0 = Debug|x64
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Debug12|Durango.ActiveCfg = Debug12|Durango
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Debug12|Durango.Build.0 = Debug12|Durango
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Debug12|x64.ActiveCfg = Debug12|x64
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Debug12|x64.Build.0 = Debug12|x64
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Profile|Durango.ActiveCfg = Profile|Durango
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Profile|Durango.Build.0 = Profile|Durango
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Profile|x64.ActiveCfg = Profile|x64
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Profile|x64.Build.0 = Profile|x64
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Profile12|Durango.ActiveCfg = Profile12|Durango
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Profile12|Durango.Build.0 = Profile12|Durango
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Profile12|x64.ActiveCfg = Profile12|x64
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Profile12|x64.Build.0 = Profile12|x64
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Release|Durango.ActiveCfg = Release|Durango
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Release|Durango.Build.0 = Release|Durango
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Release|x64.ActiveCfg = Release|x64
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Release|x64.Build.0 = Release|x64
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Release12|Durango.ActiveCfg = Release12|Durango
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Release12|Durango.Build.0 = Release12|Durango
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Release12|x64.ActiveCfg = Release12|x64
+		{5FA2B23B-E67E-41A2-9132-6CB1EB6DA0A4}.Release12|x64.Build.0 = Release12|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

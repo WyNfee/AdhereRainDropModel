@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<EtxManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/xbox/instrumentation/1">
+  <Provider>
+    <Name>XDKSampleFramework</Name>
+    <Guid>f3c9ec3f-f75c-4532-a807-04f30c597aa0</Guid>
+    <Company>Microsoft</Company>
+    <Application>SampleFramework</Application>
+    <Contact>riccerch@microsoft.com</Contact>
+    <Description>Events are used to instrument SampleFramework that ship with XboxOne XDK and it is used by majority of samples.</Description>
+  </Provider>
+  <DefaultSettings>
+    <UploadEnabled>OnByDefault</UploadEnabled>
+    <PopulationSampleRate>100</PopulationSampleRate>
+    <Latency>Normal</Latency>
+    <Priority>Normal</Priority>
+  </DefaultSettings>
+  <Events>
+    <Event Name="FrameworkLoaded" PopulationSampleRate="100" Latency="ProviderDefault" Priority="ProviderDefault" UploadEnabled="ProviderDefault">
+      <Description>This event is fired when SampleFraework is initialized and loaded by a Sample.</Description>
+      <PartC Version="1">
+        <Fields>
+          <Field Name="ExeName" Type="UnicodeString">
+            <Description>Name of the exe that loaded the SampleFramework</Description>
+          </Field>
+        </Fields>
+      </PartC>
+    </Event>
+  </Events>
+</EtxManifest>

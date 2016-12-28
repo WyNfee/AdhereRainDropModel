@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--
+
+this file should be only included for PC targets
+
+ -->
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup>
+    <!-- setup include, lib and bin paths for the builds -->
+    <IncludePath>$(SampleIncludeDir)\SampleFramework;$(SampleIncludeDir)\DirectXTK\inc;$(IncludePath);</IncludePath>
+    <LibraryPath>$(SampleLibDir);$(SampleExtraLibDir);$(LibraryPath);</LibraryPath>
+    <!-- make sure fxc can be found -->
+    <ExecutablePath>$(SampleExePath);$(ExecutablePath)</ExecutablePath>
+  </PropertyGroup>
+  
+    <!-- Release PC config -->
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+        <ClCompile>
+            <PreprocessorDefinitions>NDEBUG;_WINDOWS;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <WarningLevel>Level4</WarningLevel>
+            <TreatWarningAsError>false</TreatWarningAsError>
+            <CompileAsWinRT>false</CompileAsWinRT>
+            <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+            <FloatingPointModel>Fast</FloatingPointModel>
+        </ClCompile>
+        <Link>
+            <AdditionalDependencies>SampleFramework$(PlatformToolsetVersion)PC.lib;DirectXTK_XDK$(PlatformToolsetVersion)PC.lib;dxguid.lib;d3dcompiler.lib;xinput9_1_0.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+        </Link>
+        <CustomBuildStep>
+            <Command>
+                call "$(SampleRoot)copymedia.bat" MediaList.txt "$(OutDir)Media" "$(SampleMediaDir)" "$(ProjectDir)Media"
+                echo CopyMediaDepFile &gt;&gt; "$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp"
+            </Command>
+        </CustomBuildStep>
+        <CustomBuildStep>
+            <Outputs>$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp</Outputs>
+        </CustomBuildStep>
+    </ItemDefinitionGroup>
+	
+    <!-- Debug PC config -->
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+        <ClCompile>
+            <PreprocessorDefinitions>DEBUG;_DEBUG;_WINDOWS;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <WarningLevel>Level4</WarningLevel>
+            <TreatWarningAsError>false</TreatWarningAsError>
+            <CompileAsWinRT>false</CompileAsWinRT>
+            <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+            <FloatingPointModel>Fast</FloatingPointModel>
+        </ClCompile>
+        <Link>
+            <AdditionalDependencies>SampleFramework$(PlatformToolsetVersion)PCd.lib;DirectXTK_XDK$(PlatformToolsetVersion)PCd.lib;dxguid.lib;d3dcompiler.lib;xinput9_1_0.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+        </Link>
+        <CustomBuildStep>
+            <Command>
+                call "$(SampleRoot)copymedia.bat" MediaList.txt "$(OutDir)Media" "$(SampleMediaDir)" "$(ProjectDir)Media"
+                echo CopyMediaDepFile &gt;&gt; "$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp"
+            </Command>
+        </CustomBuildStep>
+        <CustomBuildStep>
+            <Outputs>$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp</Outputs>
+        </CustomBuildStep>
+    </ItemDefinitionGroup>
+	
+    <!-- Profile PC config -->
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'" Label="PropertySheets">
+        <ClCompile>
+            <PreprocessorDefinitions>PROFILE;NDEBUG;_WINDOWS;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <WarningLevel>Level4</WarningLevel>
+            <TreatWarningAsError>false</TreatWarningAsError>
+            <CompileAsWinRT>false</CompileAsWinRT>
+            <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+            <FloatingPointModel>Fast</FloatingPointModel>
+        </ClCompile>
+        <Link>
+            <AdditionalDependencies>SampleFramework$(PlatformToolsetVersion)PCi.lib;DirectXTK_XDK$(PlatformToolsetVersion)PCi.lib;dxguid.lib;d3dcompiler.lib;xinput9_1_0.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+        </Link>
+        <CustomBuildStep>
+            <Command>
+                call "$(SampleRoot)copymedia.bat" MediaList.txt "$(OutDir)Media" "$(SampleMediaDir)" "$(ProjectDir)Media"
+                echo CopyMediaDepFile &gt;&gt; "$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp"
+            </Command>
+        </CustomBuildStep>
+        <CustomBuildStep>
+            <Outputs>$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp</Outputs>
+        </CustomBuildStep>
+    </ItemDefinitionGroup>
+    <PropertyGroup>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <CustomBuildStep>
+      <Inputs>MediaList.txt</Inputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  
+    <!-- Release PC12 config -->
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release12|x64'" Label="PropertySheets">
+        <ClCompile>
+            <PreprocessorDefinitions>XSF_USE_DX_12_0;NDEBUG;_WINDOWS;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <WarningLevel>Level4</WarningLevel>
+            <TreatWarningAsError>false</TreatWarningAsError>
+            <CompileAsWinRT>false</CompileAsWinRT>
+            <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+            <FloatingPointModel>Fast</FloatingPointModel>
+        </ClCompile>
+        <Link>
+            <AdditionalDependencies>SampleFramework$(PlatformToolsetVersion)PC12.lib;DirectXTK_XDK$(PlatformToolsetVersion)PC.lib;dxguid.lib;d3dcompiler.lib;xinput9_1_0.lib;d3d12.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+        </Link>
+        <CustomBuildStep>
+            <Command>
+                call "$(SampleRoot)copymedia.bat" MediaList.txt "$(OutDir)Media" "$(SampleMediaDir)" "$(ProjectDir)Media"
+                echo CopyMediaDepFile &gt;&gt; "$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp"
+            </Command>
+        </CustomBuildStep>
+        <CustomBuildStep>
+            <Outputs>$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp</Outputs>
+        </CustomBuildStep>
+    </ItemDefinitionGroup>
+	
+	<!-- Debug PC12 config -->
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'" Label="PropertySheets">
+        <ClCompile>
+            <PreprocessorDefinitions>XSF_USE_DX_12_0;DEBUG;_DEBUG;_WINDOWS;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <WarningLevel>Level4</WarningLevel>
+            <TreatWarningAsError>false</TreatWarningAsError>
+            <CompileAsWinRT>false</CompileAsWinRT>
+            <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+            <FloatingPointModel>Fast</FloatingPointModel>
+        </ClCompile>
+        <Link>
+            <AdditionalDependencies>SampleFramework$(PlatformToolsetVersion)PC12d.lib;DirectXTK_XDK$(PlatformToolsetVersion)PCd.lib;dxguid.lib;d3dcompiler.lib;xinput9_1_0.lib;d3d12.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+        </Link>
+        <CustomBuildStep>
+            <Command>
+                call "$(SampleRoot)copymedia.bat" MediaList.txt "$(OutDir)Media" "$(SampleMediaDir)" "$(ProjectDir)Media"
+                echo CopyMediaDepFile &gt;&gt; "$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp"
+            </Command>
+        </CustomBuildStep>
+        <CustomBuildStep>
+            <Outputs>$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp</Outputs>
+        </CustomBuildStep>
+    </ItemDefinitionGroup>
+	
+	<!-- Profile PC12 config -->
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'" Label="PropertySheets">
+        <ClCompile>
+            <PreprocessorDefinitions>XSF_USE_DX_12_0;PROFILE;NDEBUG;_WINDOWS;WIN32_LEAN_AND_MEAN;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <WarningLevel>Level4</WarningLevel>
+            <TreatWarningAsError>false</TreatWarningAsError>
+            <CompileAsWinRT>false</CompileAsWinRT>
+            <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+            <FloatingPointModel>Fast</FloatingPointModel>
+        </ClCompile>
+        <Link>
+            <AdditionalDependencies>SampleFramework$(PlatformToolsetVersion)PC12i.lib;DirectXTK_XDK$(PlatformToolsetVersion)PCi.lib;dxguid.lib;d3dcompiler.lib;xinput9_1_0.lib;d3d12.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+        </Link>
+        <CustomBuildStep>
+            <Command>
+                call "$(SampleRoot)copymedia.bat" MediaList.txt "$(OutDir)Media" "$(SampleMediaDir)" "$(ProjectDir)Media"
+                echo CopyMediaDepFile &gt;&gt; "$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp"
+            </Command>
+        </CustomBuildStep>
+        <CustomBuildStep>
+            <Outputs>$(OutDir)\Media\$(ProjectName).$(Configuration).$(Platform).buildmedia.tmp</Outputs>
+        </CustomBuildStep>
+    </ItemDefinitionGroup>
+    <PropertyGroup>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <CustomBuildStep>
+      <Inputs>MediaList.txt</Inputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  
+</Project>
