@@ -1,4 +1,4 @@
-import Data.accessory.bezier_curve as bezier_curve
+import bezier_curve
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
