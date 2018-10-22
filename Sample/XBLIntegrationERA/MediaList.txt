@@ -1,7 +1,0 @@
-!COMMON_MEDIA_DIR!\Textures    !OUTDIR_COMMON!\Textures    ATGGraphicsLogo.png
-!COMMON_MEDIA_DIR!\Textures    !OUTDIR_COMMON!\Textures    ATGSmallLogo.png
-!COMMON_MEDIA_DIR!\Textures    !OUTDIR_COMMON!\Textures    ATGSplashScreen.png
-!COMMON_MEDIA_DIR!\Textures    !OUTDIR_COMMON!\Textures    ATGStoreLogo.png
-!COMMON_MEDIA_DIR!\Fonts    !OUTDIR_COMMON!\Fonts    *.*
-!COMMON_MEDIA_DIR!\Help    !OUTDIR_COMMON!\Help    *.*
-!COMMON_MEDIA_BUILT_DIR!\Shaders    !OUTDIR_COMMON!\Shaders    *.*
