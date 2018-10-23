@@ -50,11 +50,10 @@ Temporary Items
 
 #DO NOT need follwoing directory
 .idea
-TFB_SUMMARY
 __pycache__
-ReferenceCode
 
 # Custom Ignore
 # DO NOT NEED FOLLOWING DATA
 *.jpg
 *.bmp
+*.pyc

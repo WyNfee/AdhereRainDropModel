@@ -166,7 +166,22 @@ def _generate_curve_shape_control_points(colored_points):
     x_list = [((x - min_x)/width - 0.5) * 2 for x in x_list]  # convert x_list to [-1, 1]
     y_list = [((y - min_y)/height - 0.5) * 2 for y in y_list] # convert y to [-1,1]
 
-    access_list = [0, 1, 3, 5, 7, 9, 8, 6, 4, 2, 0]
+    # a bunch of hacking to access the data in order to generate a clockwise data point access order
+    list_length = len(x_list)
+    access_index_range = range(list_length)
+    access_list = list()
+    acc_idx = 0
+
+    while acc_idx < list_length:
+        data = 2 * acc_idx + 1
+        if data < list_length:
+            access_list.append(access_index_range[data])
+        else:
+            access_list.append(access_index_range[list_length - 1 - data])
+        acc_idx += 1
+
+    access_list = [0] + access_list
+    #access_list = [0, 1, 3, 5, 7, 9, 8, 6, 4, 2, 0]
 
     check_point_list = list()
 
@@ -177,9 +192,14 @@ def _generate_curve_shape_control_points(colored_points):
 
 
 def _plot_shape_cubic_curve(shape_curve):
+
+    x_collection = [data[0] for data in shape_curve]
+    y_collection = [data[1] for data in shape_curve]
+
     theta = 2 * np.pi * np.linspace(0, 1, 11)
     cs = CubicSpline(theta, shape_curve, bc_type='periodic')
     xs = 2 * np.pi * np.linspace(0, 1, 200)
+    plt.plot(x_collection, y_collection, 'o', label='data')
     plt.plot(cs(xs)[:, 0], cs(xs)[:, 1], label='spline')
     plt.show()
 
