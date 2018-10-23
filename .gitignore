@@ -13,7 +13,6 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
-*.bmp
 
 # Windows shortcuts
 *.lnk
@@ -46,4 +45,16 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+#DO NOT need following data
+
+#DO NOT need follwoing directory
 .idea
+TFB_SUMMARY
+__pycache__
+ReferenceCode
+
+# Custom Ignore
+# DO NOT NEED FOLLOWING DATA
+*.jpg
+*.bmp
