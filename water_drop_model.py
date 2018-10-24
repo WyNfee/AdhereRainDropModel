@@ -126,6 +126,7 @@ def convert_model_to_mesh(model_data, max_x_value, max_y_value, enable_debug=Fal
     :param model_data: the model data used to generate the data
     :param max_x_value: the max x value of model data (note: model data must be all > 0)
     :param max_y_value: the max y value of model data (note: model data must be all > 0)
+    :param enable_debug: whether this function enable debugging
     :return:
     """
 
@@ -161,7 +162,7 @@ def convert_model_to_mesh(model_data, max_x_value, max_y_value, enable_debug=Fal
                             mesh_data[sample_h_idx][sample_w_idx][2] = mesh_point_z
 
     if enable_debug is True:
-        lim_value = max([xmax, ymax])
+        lim_value = max([max_x_value, max_y_value])
         fig = plt.figure()
         ax = fig.gca(projection='3d')
         ax.set_title("rain drop Mesh - 3D")
@@ -255,7 +256,20 @@ def compute_normal_based_on_mesh(mesh_data, enable_debug=False):
     return normal_data
 
 
+def generate_drop_model(data_file, length, width, height, peak_offset, lines_step=0.001):
+    shape_x_list, shape_y_list, peak_shape_y_list, peak_z_list = \
+        read_drop_data(data_file, length, width, height, peak_offset, lines_step, enable_debug=False)
+    rain_drop_model, xmax, ymax = generate_3d_model(shape_x_list, shape_y_list, peak_shape_y_list, peak_z_list, enable_debug=False)
+    rain_drop_mesh = convert_model_to_mesh(rain_drop_model, xmax, ymax, enable_debug=False)
+    rain_drop_normal = compute_normal_based_on_mesh(rain_drop_mesh, enable_debug=False)
+
+    return rain_drop_mesh, rain_drop_normal
+
+
+"""
+A sample code to test through tehe script
 shape_x_list, shape_y_list, peak_shape_y_list, peak_z_list = read_drop_data(reader.DEBUG_TEST_MAP, enable_debug=False)
 rain_drop_model, xmax, ymax = generate_3d_model(shape_x_list, shape_y_list, peak_shape_y_list, peak_z_list, enable_debug=False)
 rain_drop_mesh = convert_model_to_mesh(rain_drop_model, xmax, ymax, enable_debug=False)
 rain_drop_normal = compute_normal_based_on_mesh(rain_drop_mesh, enable_debug=True)
+"""
