@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import CubicSpline
 
 Point = namedtuple("Point", ["X", "Y", "Color"])
-ControlPoints = namedtuple("ControlPoints", ["HeightCurve", "HeightPeak","ShapeCurveA", "ShapeCurveB"])
+ControlPoints = namedtuple("ControlPoints", ["HeightCurve", "HeightPeak", "ShapeCurveA", "ShapeCurveB"])
 
 COLOR_TYPE_DICT = {
     "RED": 1,
@@ -20,6 +20,8 @@ COLOR_TYPE_DICT = {
     "WHITE": 4,
     "GREEN": 5
 }
+
+DEBUG_TEST_MAP = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\test.bmp"
 
 
 def read_met_file(file_path):
@@ -98,11 +100,12 @@ def _plot_data_point(data_points, height, width):
             color = (255, 255, 255)  # White
         elif c_idx == 5:
             color = (0, 255, 0)      # Green
+        else:
+            color = (255, 255, 255)  # White
 
         plot_plate[y_idx][x_idx] = color
         cv2.circle(plot_plate, (x_idx, y_idx), 4, color)
 
-    if enable_debug_plot is True:
         cv2.imshow("DATA POINT RECONSTRUCT", plot_plate)
         cv2.waitKey(-1)
 
@@ -164,7 +167,7 @@ def _generate_curve_shape_control_points(colored_points):
     height = max_y - min_y
 
     x_list = [((x - min_x)/width - 0.5) * 2 for x in x_list]  # convert x_list to [-1, 1]
-    y_list = [((min_y - y)/height - 0.5) * 2 for y in y_list] # convert y to [-1,1]
+    y_list = [((min_y - y)/height - 0.5) * 2 for y in y_list]  # convert y to [-1,1]
 
     # a bunch of hacking to access the data in order to generate a clockwise data point access order
     list_length = len(x_list)
@@ -182,7 +185,7 @@ def _generate_curve_shape_control_points(colored_points):
 
     # to hack a list like below, a clockwise iteration of data that has been sorted
     access_list = [0] + access_list
-    #access_list = [0, 1, 3, 5, 7, 9, 8, 6, 4, 2, 0]
+    # access_list = [0, 1, 3, 5, 7, 9, 8, 6, 4, 2, 0]
 
     check_point_list = list()
 
@@ -199,7 +202,7 @@ def _plot_shape_cubic_curve(shape_curve):
 
     theta = 2 * np.pi * np.linspace(0, 1, 11)
     cs = CubicSpline(theta, shape_curve, bc_type='periodic')
-    xs = 2 * np.pi * np.linspace(0, 1, 200)
+    xs = 2 * np.pi * np.linspace(0, 1, 1000)
     plt.plot(x_collection, y_collection, 'o', label='data')
     plt.plot(cs(xs)[:, 0], cs(xs)[:, 1], label='spline')
     plt.show()
@@ -233,12 +236,53 @@ def convert_data_points_to_control_points(data_points, enable_debug_plot=False):
         _plot_common_cubic_curve(height_peak)
         _plot_shape_cubic_curve(shape_curve)
 
+    return height_curve, height_peak, shape_curve
+
+
+def convert_control_points_to_curve_points_collection(control_points, line_step=0.001, curve_type="common"):
+    points_collection = list()
+    if curve_type == "common":
+        x_coord = [p[0] for p in control_points]
+        y_coord = [p[1] for p in control_points]
+        cs = CubicSpline(x_coord, y_coord)
+        xs = np.arange(0, 1, line_step)
+        ys = cs(xs)
+    else:
+        theta = 2 * np.pi * np.linspace(0, 1, len(control_points))
+        cs = CubicSpline(theta, control_points, bc_type='periodic')
+        ts = 2 * np.pi * np.linspace(0, 1, int(1 / line_step))
+        xs = cs(ts)[:, 0]
+        ys = cs(ts)[:, 1]
+
+    points_collection = list(zip(xs, ys))
+
+    return points_collection
+
+
+def generate_curve_list(data_file, line_step=0.001):
+    """
+    a general function of reader, output height peak/height curve/shape curve
+    :param data_file: the data file used to generate the curve
+    :param line_step: the line step of each point generation
+    :return: point list of height peak/height curve/shape curve
+    """
+    file_data = read_met_file(data_file)
+    data_points_collection = extract_data(file_data)
+    h_curve, h_peak, shape_curve = convert_data_points_to_control_points(data_points_collection)
+    h_curve_points = convert_control_points_to_curve_points_collection(h_curve, line_step=line_step)
+    h_peak_points = convert_control_points_to_curve_points_collection(h_peak, line_step=line_step)
+    shape_curve_points = convert_control_points_to_curve_points_collection(shape_curve, line_step=line_step, curve_type="shape")
+
+    return h_curve_points, h_peak_points, shape_curve_points
+
+
+generate_curve_list(DEBUG_TEST_MAP)
 
 """
 # How to use sample code
-met_data = read_met_file(r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\test.bmp")
+met_data = read_met_file()
 valid_data_point = extract_data(met_data)
-_plot_data_point(valid_data_point, met_data.shape[0], met_data.shape[1])
+#_plot_data_point(valid_data_point, met_data.shape[0], met_data.shape[1])
 convert_data_points_to_control_points(valid_data_point, enable_debug_plot=True)
 
 cv2.imshow("data", met_data)
