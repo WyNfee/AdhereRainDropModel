@@ -7,7 +7,6 @@ Description: This script will extract the data in met file for adhere rain drop 
 import cv2
 import numpy as np
 from collections import namedtuple
-import bezier_curve
 import matplotlib.pyplot as plt
 from scipy.interpolate import CubicSpline
 
@@ -103,8 +102,9 @@ def _plot_data_point(data_points, height, width):
         plot_plate[y_idx][x_idx] = color
         cv2.circle(plot_plate, (x_idx, y_idx), 4, color)
 
-    cv2.imshow("DATA POINT RECONSTRUCT", plot_plate)
-    cv2.waitKey(-1)
+    if enable_debug_plot is True:
+        cv2.imshow("DATA POINT RECONSTRUCT", plot_plate)
+        cv2.waitKey(-1)
 
 
 def _sort_points_by_x_axis(e):
@@ -164,7 +164,7 @@ def _generate_curve_shape_control_points(colored_points):
     height = max_y - min_y
 
     x_list = [((x - min_x)/width - 0.5) * 2 for x in x_list]  # convert x_list to [-1, 1]
-    y_list = [((y - min_y)/height - 0.5) * 2 for y in y_list] # convert y to [-1,1]
+    y_list = [((min_y - y)/height - 0.5) * 2 for y in y_list] # convert y to [-1,1]
 
     # a bunch of hacking to access the data in order to generate a clockwise data point access order
     list_length = len(x_list)
@@ -180,6 +180,7 @@ def _generate_curve_shape_control_points(colored_points):
             access_list.append(access_index_range[list_length - 1 - data])
         acc_idx += 1
 
+    # to hack a list like below, a clockwise iteration of data that has been sorted
     access_list = [0] + access_list
     #access_list = [0, 1, 3, 5, 7, 9, 8, 6, 4, 2, 0]
 
@@ -204,7 +205,7 @@ def _plot_shape_cubic_curve(shape_curve):
     plt.show()
 
 
-def convert_data_points_to_control_points(data_points):
+def convert_data_points_to_control_points(data_points, enable_debug_plot=False):
     green_points = list()
     black_points = list()
     red_points = list()
@@ -227,11 +228,14 @@ def convert_data_points_to_control_points(data_points):
     height_peak = _generate_curve_common_control_points(blue_points)
     shape_curve = _generate_curve_shape_control_points(black_points)
 
-    _plot_common_cubic_curve(height_curve)
-    _plot_common_cubic_curve(height_peak)
-    _plot_shape_cubic_curve(shape_curve)
+    if enable_debug_plot is True:
+        _plot_common_cubic_curve(height_curve)
+        _plot_common_cubic_curve(height_peak)
+        _plot_shape_cubic_curve(shape_curve)
 
 
+"""
+# How to use sample code
 met_data = read_met_file(r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\test.bmp")
 valid_data_point = extract_data(met_data)
 _plot_data_point(valid_data_point, met_data.shape[0], met_data.shape[1])
@@ -239,3 +243,4 @@ convert_data_points_to_control_points(valid_data_point)
 
 cv2.imshow("data", met_data)
 cv2.waitKey(-1)
+"""
