@@ -239,7 +239,7 @@ def convert_data_points_to_control_points(data_points, enable_debug_plot=False):
 met_data = read_met_file(r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\test.bmp")
 valid_data_point = extract_data(met_data)
 _plot_data_point(valid_data_point, met_data.shape[0], met_data.shape[1])
-convert_data_points_to_control_points(valid_data_point)
+convert_data_points_to_control_points(valid_data_point, enable_debug_plot=True)
 
 cv2.imshow("data", met_data)
 cv2.waitKey(-1)
