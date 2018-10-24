@@ -130,8 +130,8 @@ def _generate_curve_common_control_points(colored_points):
     min_y = min(y_list)
     height = max_y - min_y
 
-    x_list = [(x - min_x) / width for x in x_list]
-    y_list = [(max_y - y) / height for y in y_list]
+    x_list = [((x - min_x) / width - 0.5) * 2 for x in x_list]
+    y_list = [-((y - min_y) / height - 0.5) * 2 for y in y_list]
 
     control_points = list()
 
@@ -167,7 +167,7 @@ def _generate_curve_shape_control_points(colored_points):
     height = max_y - min_y
 
     x_list = [((x - min_x)/width - 0.5) * 2 for x in x_list]  # convert x_list to [-1, 1]
-    y_list = [((min_y - y)/height - 0.5) * 2 for y in y_list]  # convert y to [-1,1]
+    y_list = [-((y - min_y)/height - 0.5) * 2 for y in y_list]  # convert y to [-1,1]
 
     # a bunch of hacking to access the data in order to generate a clockwise data point access order
     list_length = len(x_list)
@@ -240,17 +240,16 @@ def convert_data_points_to_control_points(data_points, enable_debug_plot=False):
 
 
 def convert_control_points_to_curve_points_collection(control_points, line_step=0.001, curve_type="common"):
-    points_collection = list()
     if curve_type == "common":
         x_coord = [p[0] for p in control_points]
         y_coord = [p[1] for p in control_points]
         cs = CubicSpline(x_coord, y_coord)
-        xs = np.arange(0, 1, line_step)
+        xs = np.arange(-1, 1, line_step)
         ys = cs(xs)
     else:
         theta = 2 * np.pi * np.linspace(0, 1, len(control_points))
         cs = CubicSpline(theta, control_points, bc_type='periodic')
-        ts = 2 * np.pi * np.linspace(0, 1, int(1 / line_step))
+        ts = 2 * np.pi * np.linspace(0, 1, int(4 / line_step))
         xs = cs(ts)[:, 0]
         ys = cs(ts)[:, 1]
 
