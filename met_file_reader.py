@@ -21,7 +21,7 @@ COLOR_TYPE_DICT = {
     "GREEN": 5
 }
 
-DEBUG_TEST_MAP = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\test.bmp"
+DEBUG_TEST_MAP = r"/home/maxieye/Documents/Git/AdhereRainDropModel/test.bmp"
 
 
 def read_met_file(file_path):
@@ -114,7 +114,7 @@ def _sort_points_by_x_axis(e):
     return e.X
 
 
-def _generate_curve_common_control_points(colored_points):
+def _generate_curve_common_control_points(colored_points, norm="y-11"):
     points_list = colored_points
 
     points_list.sort(key=_sort_points_by_x_axis)
@@ -131,7 +131,11 @@ def _generate_curve_common_control_points(colored_points):
     height = max_y - min_y
 
     x_list = [((x - min_x) / width - 0.5) * 2 for x in x_list]
-    y_list = [-((y - min_y) / height - 0.5) * 2 for y in y_list]
+
+    if norm == "y-11":
+        y_list = [-((y - min_y) / height - 0.5) * 2 for y in y_list]
+    else:
+        y_list = [(max_y - y) / height for y in y_list]
 
     control_points = list()
 
@@ -227,8 +231,8 @@ def convert_data_points_to_control_points(data_points, enable_debug_plot=False):
         else:
             raise ValueError("Not support color exists in color points")
 
-    height_curve = _generate_curve_common_control_points(red_points)
-    height_peak = _generate_curve_common_control_points(blue_points)
+    height_curve = _generate_curve_common_control_points(blue_points)
+    height_peak = _generate_curve_common_control_points(red_points, norm="y01")
     shape_curve = _generate_curve_shape_control_points(black_points)
 
     if enable_debug_plot is True:

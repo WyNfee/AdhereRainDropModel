@@ -16,7 +16,7 @@ def _get_curve_line(control_points):
     return axis_1_points, axis_2_points
 
 
-def read_drop_data(data_file, length=100, width=100, height=20, peak_shape_offset=0.1, line_step=0.001, enable_debug=False):
+def read_drop_data(data_file, length=100, width=100, height=20, peak_shape_offset=0.5, line_step=0.001, enable_debug=False):
     h_curve_points, h_peak_points, shape_curve_points = reader.generate_curve_list(data_file, line_step)
 
     sxs = [p[0] * width for p in shape_curve_points]
@@ -57,6 +57,7 @@ def read_drop_data(data_file, length=100, width=100, height=20, peak_shape_offse
     ax.set_xlabel('X axis')
     ax.set_ylabel('Y axis')
     ax.set_zlabel('Z axis')
+    ax.set_zlim(0, 100)
     for idx, data in enumerate(model_data):
         if idx % 50 == 0:
             ax.plot(data[0], data[1], data[2], 'b-')
@@ -71,5 +72,5 @@ def read_drop_data(data_file, length=100, width=100, height=20, peak_shape_offse
     #plt.show()
 
 
-read_drop_data(reader.DEBUG_TEST_MAP, enable_debug=True)
+read_drop_data(reader.DEBUG_TEST_MAP, enable_debug=False)
 
