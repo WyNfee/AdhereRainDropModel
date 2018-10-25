@@ -97,10 +97,9 @@ def generate_3d_model(sxs, sys, psys, pzs, enable_debug=False):
 
         model_data.append((sur_x, sur_y, sur_z))
 
+    if enable_debug is True:
         xmax = max(sxs)
         ymax = max(sys)
-
-    if enable_debug is True:
         lim_value = max([xmax, ymax])
         fig = plt.figure()
         ax = fig.gca(projection='3d')
@@ -117,52 +116,51 @@ def generate_3d_model(sxs, sys, psys, pzs, enable_debug=False):
 
         plt.show()
 
-    return model_data, xmax, ymax
+    return model_data
 
 
-def convert_model_to_mesh(model_data, max_x_value, max_y_value, enable_debug=False):
+def convert_model_to_mesh(model_data, enable_debug=False):
     """
     generate the mesh based on the model data
     :param model_data: the model data used to generate the data
-    :param max_x_value: the max x value of model data (note: model data must be all > 0)
-    :param max_y_value: the max y value of model data (note: model data must be all > 0)
     :param enable_debug: whether this function enable debugging
     :return:
     """
+    model_data_length = len(model_data)
+    mesh_width = len(model_data[0][0])
 
-    mesh_width = int(np.ceil(max_x_value))
-    mesh_height = int(np.ceil(max_y_value))
+    sample_model_step = np.ceil(model_data_length / mesh_width)
+    mesh_width = int(model_data_length / sample_model_step)
 
-    sample_step_x = int(len(model_data[0][0]) / mesh_width)
-    sample_step_y = int(len(model_data) / mesh_height)
+    mesh_data = np.zeros([mesh_width, mesh_width, 3])
 
-    # reserve 1 slot for boundary
-    mesh_data_height = mesh_height
-    mesh_data_width = mesh_width
-    mesh_data = np.zeros([mesh_data_height, mesh_data_width, 3])
+    max_x = 0
+    max_y = 0
+    max_z = 0
 
-    for h_idx in range(len(model_data)):
-        if h_idx % sample_step_y == 0:
-            sample_h_idx = int(h_idx / sample_step_y)
+    for h_idx in range(model_data_length):
+        if h_idx % sample_model_step == 0:
+            sampled_h_idx = int(h_idx / sample_model_step)
+            for w_idx in range(mesh_width):
+                mesh_point_x = model_data[h_idx][0][w_idx]
+                mesh_point_y = model_data[h_idx][1][w_idx]
+                mesh_point_z = model_data[h_idx][2][w_idx]
 
-            for w_idx in range(len(model_data[0][0])):
-                if w_idx % sample_step_x == 0:
-                    sample_w_idx = int(w_idx / sample_step_x)
+                mesh_data[sampled_h_idx][w_idx][0] = mesh_point_x
+                mesh_data[sampled_h_idx][w_idx][1] = mesh_point_y
+                mesh_data[sampled_h_idx][w_idx][2] = mesh_point_z
 
-                    mesh_point_x = model_data[h_idx][0][w_idx]
-                    mesh_point_y = model_data[h_idx][1][w_idx]
-                    mesh_point_z = model_data[h_idx][2][w_idx]
+                if max_x < mesh_point_x:
+                    max_x = mesh_point_x
 
-                    if sample_h_idx < mesh_data_height and sample_w_idx < mesh_data_width:
-                        mesh_data[sample_h_idx][sample_w_idx][0] = mesh_point_x
-                        mesh_data[sample_h_idx][sample_w_idx][1] = mesh_point_y
-                        if sample_w_idx == mesh_data_width - 1:
-                            mesh_data[sample_h_idx][sample_w_idx][2] = 0
-                        else:
-                            mesh_data[sample_h_idx][sample_w_idx][2] = mesh_point_z
+                if max_y < mesh_point_y:
+                    max_y = mesh_point_y
+
+                if max_z < mesh_point_z:
+                    max_z = mesh_point_z
 
     if enable_debug is True:
-        lim_value = max([max_x_value, max_y_value])
+        lim_value = max([max_y, max_x, max_z])
         fig = plt.figure()
         ax = fig.gca(projection='3d')
         ax.set_title("rain drop Mesh - 3D")
@@ -220,11 +218,15 @@ def _compute_normal(mesh_data, current_h_idx, current_w_idx):
     return final_normal
 
 
-def compute_normal_based_on_mesh(mesh_data, enable_debug=False):
+def compute_normal_based_on_mesh(mesh_data, enable_debug=False, batch_to_debug_show=20, debug_show_scale=4):
     height = mesh_data.shape[0]
     width = mesh_data.shape[1]
 
     normal_data = np.zeros([height, width, 3])
+
+    max_x = 0
+    max_y = 0
+    max_z = 0
 
     for h_idx in range(height):
         for w_idx in range(width):
@@ -232,8 +234,18 @@ def compute_normal_based_on_mesh(mesh_data, enable_debug=False):
                 norm = _compute_normal(mesh_data, h_idx, w_idx)
                 normal_data[h_idx][w_idx] = norm
 
+                if max_x < mesh_data[h_idx][w_idx][0]:
+                    max_x = mesh_data[h_idx][w_idx][0]
+
+                if max_y < mesh_data[h_idx][w_idx][1]:
+                    max_y = mesh_data[h_idx][w_idx][1]
+
+                if max_z < mesh_data[h_idx][w_idx][2]:
+                    max_z = mesh_data[h_idx][w_idx][2]
+
     if enable_debug is True:
-        lim_value = max(height, width)
+        batch_step = int(height / batch_to_debug_show)
+        lim_value = max([max_x, max_y, max_z])
         fig = plt.figure()
         ax = fig.gca(projection='3d')
         ax.set_title("rain drop Mesh - 3D")
@@ -246,8 +258,8 @@ def compute_normal_based_on_mesh(mesh_data, enable_debug=False):
         ax.plot_wireframe(mesh_data[:, :, 0], mesh_data[:, :, 1], mesh_data[:, :, 2], color='b')
         for m_h_idx in range(mesh_data.shape[0]):
             for m_w_idx in range(mesh_data.shape[1]):
-                if m_h_idx % 2 == 0 and m_w_idx % 2 == 0:
-                    normal = normal_data[m_h_idx][m_w_idx] * 3
+                if m_h_idx % batch_step == 0 and m_w_idx % batch_step == 0:
+                    normal = normal_data[m_h_idx][m_w_idx] * debug_show_scale
                     point = mesh_data[m_h_idx, m_w_idx]
                     ax.quiver(point[0], point[1], point[2], normal[0], normal[1], normal[2], color='r')
 
@@ -259,17 +271,17 @@ def compute_normal_based_on_mesh(mesh_data, enable_debug=False):
 def generate_drop_model(data_file, length, width, height, peak_offset, lines_step=0.001):
     shape_x_list, shape_y_list, peak_shape_y_list, peak_z_list = \
         read_drop_data(data_file, length, width, height, peak_offset, lines_step, enable_debug=False)
-    rain_drop_model, xmax, ymax = generate_3d_model(shape_x_list, shape_y_list, peak_shape_y_list, peak_z_list, enable_debug=False)
-    rain_drop_mesh = convert_model_to_mesh(rain_drop_model, xmax, ymax, enable_debug=False)
+    rain_drop_model = generate_3d_model(shape_x_list, shape_y_list, peak_shape_y_list, peak_z_list, enable_debug=False)
+    rain_drop_mesh = convert_model_to_mesh(rain_drop_model, enable_debug=False)
     rain_drop_normal = compute_normal_based_on_mesh(rain_drop_mesh, enable_debug=False)
 
     return rain_drop_mesh, rain_drop_normal
 
 
+# A sample code to test through tehe script
 """
-A sample code to test through tehe script
 shape_x_list, shape_y_list, peak_shape_y_list, peak_z_list = read_drop_data(reader.DEBUG_TEST_MAP, enable_debug=False)
-rain_drop_model, xmax, ymax = generate_3d_model(shape_x_list, shape_y_list, peak_shape_y_list, peak_z_list, enable_debug=False)
-rain_drop_mesh = convert_model_to_mesh(rain_drop_model, xmax, ymax, enable_debug=False)
+rain_drop_model = generate_3d_model(shape_x_list, shape_y_list, peak_shape_y_list, peak_z_list, enable_debug=False)
+rain_drop_mesh = convert_model_to_mesh(rain_drop_model, enable_debug=False)
 rain_drop_normal = compute_normal_based_on_mesh(rain_drop_mesh, enable_debug=True)
 """
