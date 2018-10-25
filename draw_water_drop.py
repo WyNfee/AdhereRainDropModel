@@ -7,8 +7,9 @@ Description: This script will render water drop on an image
 import cv2
 import numpy as np
 import water_drop_model as model
+import copy
 
-DEBUG_ROAD_IMAGE = "/home/maxieye/Documents/Git/AdhereRainDropModel/road.jpg"
+DEBUG_ROAD_IMAGE = "/home/maxieye/Documents/Git/AdhereRainDropModel/real.jpg"
 DEBUG_DROP_DATA = "/home/maxieye/Documents/Git/AdhereRainDropModel/test.bmp"
 
 
@@ -101,25 +102,108 @@ def _mapping_normal_to_pixel(reference_image, reference_normal):
     return mapping_pixel
 
 
-def create_rain_drop_on_image(base_image, reference_image, normal_data):
+def create_rain_drop_on_image(input_image, reference_image, normal_data):
+
+    water_drop_paste = copy.deepcopy(input_image)
 
     height = normal_data.shape[0]
     width = normal_data.shape[1]
 
-    base_image_height = base_image.shape[0]
-    base_image_width = base_image.shape[1]
+    water_drop_paste_height = water_drop_paste.shape[0]
+    water_drop_paste_width = water_drop_paste.shape[1]
+
+    max_pixel_loc_x = 0
+    min_pixel_loc_x = width
+
+    max_pixel_loc_y = 0
+    min_pixel_loc_y = height
 
     for h in range(height):
         for w in range(width):
             if normal_data[h][w][0] != 0 and normal_data[h][w][1] != 0 and normal_data[h][w][2] != 0:
-                pixel_loc_x = int(base_image_width/2) + w
-                pixel_loc_y = int(base_image_height/2) + h
-                base_image[pixel_loc_y][pixel_loc_x] = _mapping_normal_to_pixel(reference_image, normal_data[h][w])
-    return base_image
+                pixel_loc_x = int(water_drop_paste_width/2) + w
+                pixel_loc_y = int(water_drop_paste_height/2) + h
+
+                if pixel_loc_x < min_pixel_loc_x:
+                    min_pixel_loc_x = pixel_loc_x
+
+                if pixel_loc_x > max_pixel_loc_x:
+                    max_pixel_loc_x = pixel_loc_x
+
+                if pixel_loc_y < min_pixel_loc_y:
+                    min_pixel_loc_y = pixel_loc_y
+
+                if pixel_loc_y > max_pixel_loc_y:
+                    max_pixel_loc_y = pixel_loc_y
+
+                reference_value = reference_image[pixel_loc_y][pixel_loc_x]
+                current_value = input_image[pixel_loc_y][pixel_loc_x]
+                normal_z = normal_data[h][w][2]
+                translate_factor = normal_z * 0.3
+
+                drop_pixel = current_value * translate_factor + (1 - translate_factor) * reference_value
+
+                water_drop_paste[pixel_loc_y][pixel_loc_x] = drop_pixel
+
+
+    water_drop_paste = cv2.GaussianBlur(water_drop_paste, (31, 31), 0)
+    #cv2.imshow('adding_water_drop', water_drop_paste)
+    #cv2.waitKey(-1)
+
+    # create a filtering matrix
+
+    min_pixel_loc_y = min_pixel_loc_y - 10
+    min_pixel_loc_x = min_pixel_loc_x - 10
+
+    max_pixel_loc_y = max_pixel_loc_y + 10
+    max_pixel_loc_x = max_pixel_loc_x + 10
+
+    fill_area_height = max_pixel_loc_y - min_pixel_loc_y
+    fill_area_width = max_pixel_loc_x - min_pixel_loc_x
+
+    if fill_area_height % 2 == 0:
+        fill_area_height = fill_area_height + 1
+
+    if fill_area_width % 2 == 0:
+        fill_area_width = fill_area_width + 1
+
+    fill_area = np.zeros([fill_area_height, fill_area_width])
+
+    half_max_width_index = int(max(range(fill_area_width)) / 2)
+    half_max_height_index = int(max(range(fill_area_height)) / 2)
+
+    for f_x_idx in range(fill_area_width):
+        for f_y_idx in range(fill_area_height):
+            x_factor = (half_max_width_index - abs(f_x_idx - half_max_width_index)) / half_max_width_index
+            y_factor = (half_max_height_index - abs(f_y_idx - half_max_height_index)) / half_max_height_index
+            fill_area[f_y_idx][f_x_idx] = x_factor / 2 + y_factor / 2
+
+    # do filling
+    for h in range(water_drop_paste_height):
+        if h < min_pixel_loc_y or h >= max_pixel_loc_y:
+            continue
+
+        for w in range(water_drop_paste_width):
+            if w < min_pixel_loc_x or w >= max_pixel_loc_x:
+                continue
+
+            current_value = input_image[h][w]
+            reference_value = water_drop_paste[h][w]
+            mask_filter_value = fill_area[h - min_pixel_loc_y][w - min_pixel_loc_x]
+
+            fill_value = reference_value * mask_filter_value + (1 - mask_filter_value) * current_value
+            #fill_value = (0, 0, 255 * mask_filter_value)
+
+            input_image[h][w] = fill_value
+
+    #cv2.imshow('ref', water_drop_paste)
+    #cv2.imshow('final', input_image)
+    #cv2.waitKey(-1)
+    return input_image
 
 
 image_data, reference_data = read_image_map(DEBUG_ROAD_IMAGE)
-model_mesh, model_normal = construct_drop_model(DEBUG_DROP_DATA, 50, 50, 40, 0.15)
+model_mesh, model_normal = construct_drop_model(DEBUG_DROP_DATA, 150, 150, 40, 0.15)
 projected_normal_data = project_normal_data_image_space(model_mesh, model_normal)
 output_image = create_rain_drop_on_image(image_data, reference_data, projected_normal_data)
 
