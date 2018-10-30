@@ -15,16 +15,23 @@ Point = namedtuple("Point", ["X", "Y"])
 FileProperty = namedtuple("FileProperty", ["PATH", "NAME"])
 
 # height peak map directory
-HEIGHT_MAP_DIRECTORY = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\height"
+PEAK_HEIGHT_DIRECTORY = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\height"
+
+# shape peak map directory
+PEAK_SHAPE_DIRECTORY = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\peakshape"
 
 # save read data location
 DIR_SAVE_MAP_DATA = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\saved"
 
-# saved file name
+# saved file name of peak height
 SAVE_FILE_NAME_PEAK_HEIGHT = "peak_height"
+
+# save file name of peak shape
+SAVE_FILE_NAME_PEAK_SHAPE = "peak_shape"
 
 # since range is [min, max), so we have to set as 1.1
 # (actually, (1.0, 1.1] is always OK to generate correct index)
+# to change the range, the more list we have, the more accurate spline will reproduce/sampled
 SAMPLE_X_LIST = np.arange(0, 1.1, 0.1)
 
 
@@ -89,11 +96,13 @@ def __sort_data_points_key(e):
     return e.X
 
 
-def _format_data_points(data_points_list):
+def _format_data_points(data_points_list, form='height'):
     """
-    format the real number data point, normalized to [0, 1]
+    format the real number data point,
+    form is 'height', normalized to [0, 1]
+    form is 'shape', normalize to [-1, 1]
     :param data_points_list: the data points to do normalization
-    :return: a list of normalzied data points
+    :return: a list of normalized data points
     """
     data_points_list.sort(key=__sort_data_points_key)
 
@@ -104,14 +113,26 @@ def _format_data_points(data_points_list):
     min_x = min(x_list)
     width = max_x - min_x
 
-    max_y = max(y_list)
-    min_y = min(y_list)
-    height = max_y - min_y
-
     x_list = [((x - min_x) / width) for x in x_list]
+
     # note: y index in image direction, min_y is "upper" of max_y
-    y_list = [((max_y - y) / height) for y in y_list]
-    y_list[0] = y_list[-1] = 0
+    if form == 'height':
+        max_y = max(y_list)
+        min_y = min(y_list)
+        height = max_y - min_y
+
+        y_list = [((max_y - y) / height) for y in y_list]
+        y_list[0] = y_list[-1] = 0
+    elif form == 'shape':
+        base_height = y_list[0]
+        y_list = [(base_height - y) for y in y_list]
+        temp_y_list = [abs(y) for y in y_list]
+        max_y = max(temp_y_list)
+
+        y_list = [(y / max_y) for y in y_list]
+        y_list[0] = y_list[-1] = 0
+    else:
+        raise ValueError("Will not support such format methods")
 
     control_points = list()
 
@@ -139,6 +160,20 @@ def _sample_curve_to_generate_control_points(control_points, sample_list):
 
     sampled_control_points[-1][-1] = control_points[-1][-1]
     return sampled_control_points
+
+
+def _extract_category_and_peak_shape_count(file_name):
+    """
+    extract the category and count of a peak shape
+    :param file_name: the file name to work with, must be a format with "[category]_[count].xxx"
+    :return:
+    """
+    file_safe_name = file_name.split('.')[0]
+    name_elements = file_safe_name.split('_')
+    category = int(name_elements[0])
+    count = int(name_elements[1])
+
+    return category, count
 
 
 def _plot_common_cubic_curve(control_points):
@@ -174,9 +209,9 @@ def collect_all_image_file(dir_image_file):
     return image_path_list
 
 
-def generate_normalized_peak_data(data_list, sample_list, save_dir, save_file_name, enable_debugging=False):
+def generate_normalized_peak_height(data_list, sample_list, save_dir, save_file_name, enable_debugging=False):
     """
-    generate peak data, including shape and height, with [0,1] normalized
+    generate peak shape data with [0,1] normalized along x, y axis
     :param data_list: the data points list extract from input image
     :param sample_list: the sample list along the axis
     :param save_dir: the directory to save the peak data
@@ -202,6 +237,43 @@ def generate_normalized_peak_data(data_list, sample_list, save_dir, save_file_na
     np.save(save_file_path, peak_data)
 
 
-height_map_data_list = collect_all_image_file(HEIGHT_MAP_DIRECTORY)
-generate_normalized_peak_data(height_map_data_list, SAMPLE_X_LIST, DIR_SAVE_MAP_DATA, SAVE_FILE_NAME_PEAK_HEIGHT, False)
+def generate_normalized_peak_shape(data_list, sample_list, save_dir, save_file_name, enable_debugging=False):
+    """
+    generate peak shape data with [0,1] normalized along x axis, and [-1, 1] along y axis
 
+    :param data_list: the data points list extract from input image
+    :param sample_list: the sample list along the axis
+    :param save_dir: the directory to save the peak data
+    :param save_file_name: the file name of peak data to save
+    :param enable_debugging: whether enable debugging plot for this process
+    :return: None
+    """
+    data_amount = len(data_list)
+    sample_amount = len(SAMPLE_X_LIST)
+    save_file_path = os.path.join(save_dir, save_file_name)
+
+    # for peak shape, have to store two more values, the shape name, and its index
+    peak_data = np.zeros([data_amount, sample_amount+1, 2])
+
+    for idx, data in enumerate(data_list):
+        shape_category, shape_count = _extract_category_and_peak_shape_count(data.NAME)
+        data_point_list = _extract_single_data(data.PATH)
+        formatted_data_point_list = _format_data_points(data_point_list, 'shape')
+        sampled_control_points = _sample_curve_to_generate_control_points(formatted_data_point_list, sample_list)
+        peak_data[idx, :sample_amount, :] = sampled_control_points
+        peak_data[idx, sample_amount, 0] = shape_category
+        peak_data[idx, sample_amount, 1] = shape_count
+        if enable_debugging:
+            _plot_common_cubic_curve(sampled_control_points)
+
+    np.save(save_file_path, peak_data)
+    
+
+peak_height_data_list = collect_all_image_file(PEAK_HEIGHT_DIRECTORY)
+generate_normalized_peak_height(peak_height_data_list, SAMPLE_X_LIST, DIR_SAVE_MAP_DATA, SAVE_FILE_NAME_PEAK_HEIGHT, False)
+
+peak_shape_data_list = collect_all_image_file(PEAK_SHAPE_DIRECTORY)
+generate_normalized_peak_shape(peak_shape_data_list, SAMPLE_X_LIST, DIR_SAVE_MAP_DATA, SAVE_FILE_NAME_PEAK_SHAPE, False)
+
+
+# TODO: add drop shape process code
