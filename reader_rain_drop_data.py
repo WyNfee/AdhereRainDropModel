@@ -20,6 +20,9 @@ PEAK_HEIGHT_DIRECTORY = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Da
 # shape peak map directory
 PEAK_SHAPE_DIRECTORY = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\peakshape"
 
+# shape out map directory
+OUT_SHAPE_DIRECTORY = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\outshape"
+
 # save read data location
 DIR_SAVE_MAP_DATA = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\saved"
 
@@ -28,6 +31,9 @@ SAVE_FILE_NAME_PEAK_HEIGHT = "peak_height"
 
 # save file name of peak shape
 SAVE_FILE_NAME_PEAK_SHAPE = "peak_shape"
+
+# save file name of out shape
+SAVE_FILE_NAME_OUT_SHAPE = "out_shape"
 
 # since range is [min, max), so we have to set as 1.1
 # (actually, (1.0, 1.1] is always OK to generate correct index)
@@ -52,7 +58,7 @@ def _is_background_color(data_point):
         return False
 
 
-def _extract_single_data(single_image_path):
+def _extract_single_data(single_image_path, sample_area=5):
     """
     process a input image, extract the sample point from the image
     :param single_image_path: a image path to operate with
@@ -76,9 +82,9 @@ def _extract_single_data(single_image_path):
             if is_background is False and file_data_mask[h_idx][w_idx] == 1:
                 valid_data_list.append(Point(X=w_idx, Y=h_idx))
 
-                for mk_down_idx_h in range(5):
-                    for mk_down_idx_w in range(5):
-                        file_data_mask[h_idx + mk_down_idx_h - 2][w_idx + mk_down_idx_w - 2] = 0
+                for mk_down_idx_h in range(sample_area):
+                    for mk_down_idx_w in range(sample_area):
+                        file_data_mask[h_idx + mk_down_idx_h - int(sample_area/2)][w_idx + mk_down_idx_w - int(sample_area/2)] = 0
 
             h_idx = h_idx + 1
         w_idx = w_idx + 1
@@ -93,15 +99,145 @@ def __sort_data_points_key(e):
     :param e: the element for compare of sort function, only work with Point namedtuple
     :return: the result of each compare value
     """
-    return e.X
+    return e.X + 1 / e.Y
 
 
-def _format_data_points(data_points_list, form='height'):
+def _arrange_data_points(data_points_list, form='line'):
+    """
+    merge the duplicated sampled points, so that make it possible for function simulation
+    :param data_points_list: the data points to do this arrangement
+    :param form: the form for this arrange process
+    :return: a list of arranged data points
+    """
+    arranged_data_points_list = list()
+
+    data_points_list.sort(key=__sort_data_points_key)
+    current_x = 0
+    current_y_result_list = list()
+
+    if form == 'line':
+        # the line form, is only allow one value share the same x-axis value,
+        # if not, mean the all possible y value
+        for data in data_points_list:
+            current_y_result_list.append(data.Y)
+            if data.X == current_x:
+                continue
+            else:
+                sum_y = sum(current_y_result_list)
+                y_count = len(current_y_result_list)
+                avg_y = sum_y / y_count
+                point = Point(X=data.X, Y=avg_y)
+                arranged_data_points_list.append(point)
+
+                current_y_result_list = list()
+                current_x = data.X
+    elif form == 'cycle':
+        # the cycle form, only allow 2 value share the same x-axis value,
+        # if not,
+        # 1 value will be removed
+        # 2 or more values, will remove the additional value, only take the boundary values
+        current_x_list = list()
+        current_x = data_points_list[0].X
+        for data in data_points_list:
+            if data.X != current_x:
+                current_x_amount = len(current_x_list)
+
+                # this is a pair operation, only 2 points share same x axis will be recorded
+                if current_x_amount >= 2:
+                    min_y = min(current_y_result_list)
+                    max_y = max(current_y_result_list)
+
+                    point = Point(X=current_x, Y=min_y)
+                    arranged_data_points_list.append(point)
+
+                    point = Point(X=current_x, Y=max_y)
+                    arranged_data_points_list.append(point)
+
+                current_y_result_list = list()
+                current_x_list = list()
+                current_x = data.X
+
+            current_x_list.append(data.X)
+            current_y_result_list.append(data.Y)
+    else:
+        raise ValueError("Will not support other arrange forms")
+
+    return arranged_data_points_list
+
+
+def _split_cycle_points_to_splines(arranged_cycle_points):
+    """
+    will split the cycle points into two sets of splines, the upper and bottom one
+    NOTE: will not perform cycle points check, behavior is undefined if do this for non-arranged cycle points set
+    :param arranged_cycle_points: the arranged cycle points set
+    :return: two list, one is upper list, the other is bottom list
+    """
+    upper_list = list()
+    bottom_list = list()
+
+    # for the cycle line, we have to set the first and last to be a single point
+    # to make it a cycle
+    first_point_x = arranged_cycle_points[0].X - 1
+    first_point_y_1 = arranged_cycle_points[0].Y
+    first_point_y_2 = arranged_cycle_points[1].Y
+    last_point_x = arranged_cycle_points[-1].X + 1
+    last_point_y_1 = arranged_cycle_points[-1].Y
+    last_point_y_2 = arranged_cycle_points[-2].Y
+    first_point = Point(X=first_point_x, Y=(first_point_y_1 + first_point_y_2) / 2)
+    last_point = Point(X=last_point_x, Y=(last_point_y_1 + last_point_y_2) / 2)
+
+    upper_list.append(first_point)
+    bottom_list.append(first_point)
+
+    idx = 0
+    points_amount = len(arranged_cycle_points)
+
+    while idx < points_amount:
+        upper_point = arranged_cycle_points[idx]
+        idx += 1
+        bottom_point = arranged_cycle_points[idx]
+        idx += 1
+
+        upper_list.append(upper_point)
+        bottom_list.append(bottom_point)
+
+    upper_list.append(last_point)
+    bottom_list.append(last_point)
+
+    return upper_list, bottom_list
+
+
+def _get_max_scale_reference(upper_list, bottom_list):
+    """
+    find the scale reference for both upper and bottom list,
+    otherwise, in equal reference value will cause normalize for upper and bottom spline
+    disagree on final output
+    :param upper_list: the upper list to operate
+    :param bottom_list: the bottom list to operate
+    :return: a scalar, the reference to work on normalize the two points set
+    """
+    base_value = upper_list[0][1]
+    reference_upper_list = [abs(u[1] - base_value) for u in upper_list]
+    reference_bottom_list = [abs(u[1] - base_value) for u in bottom_list]
+
+    upper_reference = max(reference_upper_list)
+    bottom_reference = max(reference_bottom_list)
+
+    reference_value = max([upper_reference, bottom_reference])
+
+    return reference_value
+
+
+def _format_data_points(data_points_list, form='height', reference_scale=None):
     """
     format the real number data point,
     form is 'height', normalized to [0, 1]
     form is 'shape', normalize to [-1, 1]
     :param data_points_list: the data points to do normalization
+    :param form: the form of this format operation. default to height
+    :param reference_scale: only works with form is 'out',
+    to make splines process on same normalize scale,
+    if not provided, form 'out' will be separately deal with each spline with its own normalize scale
     :return: a list of normalized data points
     """
     data_points_list.sort(key=__sort_data_points_key)
@@ -131,6 +267,17 @@ def _format_data_points(data_points_list, form='height'):
 
         y_list = [(y / max_y) for y in y_list]
         y_list[0] = y_list[-1] = 0
+    elif form == 'out':
+        base_height = y_list[0]
+        y_list = [(base_height - y) for y in y_list]
+        
+        if reference_scale is None:
+            temp_y_list = [abs(y) for y in y_list]
+            max_y = max(temp_y_list)
+        else:
+            max_y = reference_scale
+
+        y_list = [(y / max_y) for y in y_list]
     else:
         raise ValueError("Will not support such format methods")
 
@@ -228,7 +375,8 @@ def generate_normalized_peak_height(data_list, sample_list, save_dir, save_file_
 
     for idx, data in enumerate(data_list):
         data_point_list = _extract_single_data(data.PATH)
-        formatted_data_point_list = _format_data_points(data_point_list)
+        arranged_point_list = _arrange_data_points(data_point_list, form='line')
+        formatted_data_point_list = _format_data_points(arranged_point_list, form='height')
         sampled_control_points = _sample_curve_to_generate_control_points(formatted_data_point_list, sample_list)
         peak_data[idx, :, :] = sampled_control_points
         if enable_debugging:
@@ -258,7 +406,8 @@ def generate_normalized_peak_shape(data_list, sample_list, save_dir, save_file_n
     for idx, data in enumerate(data_list):
         shape_category, shape_count = _extract_category_and_peak_shape_count(data.NAME)
         data_point_list = _extract_single_data(data.PATH)
-        formatted_data_point_list = _format_data_points(data_point_list, 'shape')
+        arranged_point_list = _arrange_data_points(data_point_list, form='line')
+        formatted_data_point_list = _format_data_points(arranged_point_list, 'shape')
         sampled_control_points = _sample_curve_to_generate_control_points(formatted_data_point_list, sample_list)
         peak_data[idx, :sample_amount, :] = sampled_control_points
         peak_data[idx, sample_amount, 0] = shape_category
@@ -267,13 +416,40 @@ def generate_normalized_peak_shape(data_list, sample_list, save_dir, save_file_n
             _plot_common_cubic_curve(sampled_control_points)
 
     np.save(save_file_path, peak_data)
-    
 
-peak_height_data_list = collect_all_image_file(PEAK_HEIGHT_DIRECTORY)
-generate_normalized_peak_height(peak_height_data_list, SAMPLE_X_LIST, DIR_SAVE_MAP_DATA, SAVE_FILE_NAME_PEAK_HEIGHT, False)
 
-peak_shape_data_list = collect_all_image_file(PEAK_SHAPE_DIRECTORY)
-generate_normalized_peak_shape(peak_shape_data_list, SAMPLE_X_LIST, DIR_SAVE_MAP_DATA, SAVE_FILE_NAME_PEAK_SHAPE, False)
+def generate_normalized_out_shape(data_list, sample_list, save_dir, save_file_name, enable_debugging=False):
+    data_amount = len(data_list)
+    sample_amount = len(SAMPLE_X_LIST)
+    save_file_path = os.path.join(save_dir, save_file_name)
 
+    for idx, data in enumerate(data_list):
+        # TODO: extract the category name
+        data_point_list = _extract_single_data(data.PATH, sample_area=1)
+        arranged_point_list = _arrange_data_points(data_point_list, form='cycle')
+        upper_list, bottom_list = _split_cycle_points_to_splines(arranged_point_list)
+        scale_reference = _get_max_scale_reference(upper_list, bottom_list)
+        format_upper_list = _format_data_points(upper_list, 'out', scale_reference)
+        format_bottom_list = _format_data_points(bottom_list, 'out', scale_reference)
+
+        x_coord = [p[0] for p in format_upper_list]
+        y_coord = [p[1] for p in format_upper_list]
+        plt.plot(x_coord, y_coord, 'o', label='data')
+
+        x_coord = [p[0] for p in format_bottom_list]
+        y_coord = [p[1] for p in format_bottom_list]
+        plt.plot(x_coord, y_coord, 'o', label='data1')
+        plt.show()
+    pass
+
+
+# peak_height_data_list = collect_all_image_file(PEAK_HEIGHT_DIRECTORY)
+# generate_normalized_peak_height(peak_height_data_list, SAMPLE_X_LIST, DIR_SAVE_MAP_DATA, SAVE_FILE_NAME_PEAK_HEIGHT, True)
+
+# peak_shape_data_list = collect_all_image_file(PEAK_SHAPE_DIRECTORY)
+# generate_normalized_peak_shape(peak_shape_data_list, SAMPLE_X_LIST, DIR_SAVE_MAP_DATA, SAVE_FILE_NAME_PEAK_SHAPE, True)
+
+out_shape_data_list = collect_all_image_file(OUT_SHAPE_DIRECTORY)
+generate_normalized_out_shape(out_shape_data_list, SAMPLE_X_LIST, DIR_SAVE_MAP_DATA, SAVE_FILE_NAME_OUT_SHAPE)
 
 # TODO: add drop shape process code
