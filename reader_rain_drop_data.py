@@ -251,7 +251,7 @@ def _format_data_points(data_points_list, form='height', reference_scale=None):
 
     x_list = [((x - min_x) / width) for x in x_list]
 
-    # note: y index in image direction, min_y is "upper" of max_y
+    # note: y index in image direction, min_y is "upper" to max_y
     if form == 'height':
         max_y = max(y_list)
         min_y = min(y_list)
@@ -270,7 +270,7 @@ def _format_data_points(data_points_list, form='height', reference_scale=None):
     elif form == 'out':
         base_height = y_list[0]
         y_list = [(base_height - y) for y in y_list]
-        
+
         if reference_scale is None:
             temp_y_list = [abs(y) for y in y_list]
             max_y = max(temp_y_list)
@@ -287,6 +287,31 @@ def _format_data_points(data_points_list, form='height', reference_scale=None):
         control_points.append((x_list[idx], y_list[idx]))
 
     return control_points
+
+
+def _combine_upper_and_bottom_together(upper_control_points, bottom_control_points):
+    """
+    combine two sets of control points into one, to support cycle operation
+    the reading of these points are clock-wise, from upper to bottom, assuming the reading process, like:
+    9, 10, 12, 1, 2,... ,7, 8, 9 on the clock
+    NOTE: will not do any check for upper and bottom control points,
+    the behavior will be undefined if data provided is incorrect
+    :param upper_control_points: the upper control points
+    :param bottom_control_points: the bottom control points
+    :return: a formatted spline line control points
+    """
+    _combined_control_points = list()
+    # clock wise reading not need to change on upper ones
+    _combined_control_points.extend(upper_control_points)
+    # need to reverse processing the bottom ones,
+    # but the last one, which is duplicated
+    # first one is not duplicated, for cycle process and middleware requirments
+    bottom_control_points.pop(-1)
+
+    for point in reversed(bottom_control_points):
+        _combined_control_points.append(point)
+
+    return _combined_control_points
 
 
 def _sample_curve_to_generate_control_points(control_points, sample_list):
@@ -309,11 +334,11 @@ def _sample_curve_to_generate_control_points(control_points, sample_list):
     return sampled_control_points
 
 
-def _extract_category_and_peak_shape_count(file_name):
+def _extract_category_and_peak_shape_count_from_name(file_name):
     """
     extract the category and count of a peak shape
     :param file_name: the file name to work with, must be a format with "[category]_[count].xxx"
-    :return:
+    :return: category name, count name
     """
     file_safe_name = file_name.split('.')[0]
     name_elements = file_safe_name.split('_')
@@ -321,6 +346,15 @@ def _extract_category_and_peak_shape_count(file_name):
     count = int(name_elements[1])
 
     return category, count
+
+
+def _extract_category_from_name(file_name):
+    """
+    extract the category of a out shape
+    :param file_name: the file name to work with, must be a format "[category].xxx"
+    :return: category name
+    """
+    return int(file_name.split('.')[0])
 
 
 def _plot_common_cubic_curve(control_points):
@@ -335,6 +369,25 @@ def _plot_common_cubic_curve(control_points):
     xs = np.arange(0, 1, 0.001)
     plt.plot(x_coord, y_coord, 'o', label='data')
     plt.plot(xs, cs(xs), label="S")
+    plt.show()
+
+
+def _plot_shape_cubic_curve(shape_curve):
+    """
+    plot the cubic periodic curve to preview
+    :param shape_curve:the control points to work with
+    :return: None
+    """
+    x_collection = [data[0] for data in shape_curve]
+    y_collection = [data[1] for data in shape_curve]
+
+    control_points_lenth = len(shape_curve)
+
+    theta = 2 * np.pi * np.linspace(0, 1, control_points_lenth)
+    cs = CubicSpline(theta, shape_curve, bc_type='periodic')
+    xs = 2 * np.pi * np.arange(0, 1, 0.001)
+    plt.plot(x_collection, y_collection, 'o', label='data')
+    plt.plot(cs(xs)[:, 0], cs(xs)[:, 1], label='spline')
     plt.show()
 
 
@@ -388,7 +441,6 @@ def generate_normalized_peak_height(data_list, sample_list, save_dir, save_file_
 def generate_normalized_peak_shape(data_list, sample_list, save_dir, save_file_name, enable_debugging=False):
     """
     generate peak shape data with [0,1] normalized along x axis, and [-1, 1] along y axis
-
     :param data_list: the data points list extract from input image
     :param sample_list: the sample list along the axis
     :param save_dir: the directory to save the peak data
@@ -404,7 +456,7 @@ def generate_normalized_peak_shape(data_list, sample_list, save_dir, save_file_n
     peak_data = np.zeros([data_amount, sample_amount+1, 2])
 
     for idx, data in enumerate(data_list):
-        shape_category, shape_count = _extract_category_and_peak_shape_count(data.NAME)
+        shape_category, shape_count = _extract_category_and_peak_shape_count_from_name(data.NAME)
         data_point_list = _extract_single_data(data.PATH)
         arranged_point_list = _arrange_data_points(data_point_list, form='line')
         formatted_data_point_list = _format_data_points(arranged_point_list, 'shape')
@@ -423,33 +475,38 @@ def generate_normalized_out_shape(data_list, sample_list, save_dir, save_file_na
     sample_amount = len(SAMPLE_X_LIST)
     save_file_path = os.path.join(save_dir, save_file_name)
 
+    # note, we sample sample_amount * 2 is actually numerical equal
+    # sample_amount + sample_amount - 1 for actual control points store slots
+    # 1 for category name slot
+    shape_data = np.zeros([data_amount, sample_amount * 2, 2])
+
     for idx, data in enumerate(data_list):
         # TODO: extract the category name
+        category_name = _extract_category_from_name(data.NAME)
         data_point_list = _extract_single_data(data.PATH, sample_area=1)
         arranged_point_list = _arrange_data_points(data_point_list, form='cycle')
         upper_list, bottom_list = _split_cycle_points_to_splines(arranged_point_list)
         scale_reference = _get_max_scale_reference(upper_list, bottom_list)
         format_upper_list = _format_data_points(upper_list, 'out', scale_reference)
         format_bottom_list = _format_data_points(bottom_list, 'out', scale_reference)
+        sampled_upper_control_points = _sample_curve_to_generate_control_points(format_upper_list, sample_list)
+        sampled_bottom_control_points = _sample_curve_to_generate_control_points(format_bottom_list, sample_list)
+        sampled_whole_cycle_points = _combine_upper_and_bottom_together(sampled_upper_control_points, sampled_bottom_control_points)
 
-        x_coord = [p[0] for p in format_upper_list]
-        y_coord = [p[1] for p in format_upper_list]
-        plt.plot(x_coord, y_coord, 'o', label='data')
+        shape_data[idx, :sample_amount * 2 - 1, :] = sampled_whole_cycle_points
+        shape_data[idx, sample_amount, 0] = category_name
 
-        x_coord = [p[0] for p in format_bottom_list]
-        y_coord = [p[1] for p in format_bottom_list]
-        plt.plot(x_coord, y_coord, 'o', label='data1')
-        plt.show()
-    pass
+        if enable_debugging:
+            _plot_shape_cubic_curve(sampled_whole_cycle_points)
+
+    np.save(save_file_path, shape_data)
 
 
-# peak_height_data_list = collect_all_image_file(PEAK_HEIGHT_DIRECTORY)
-# generate_normalized_peak_height(peak_height_data_list, SAMPLE_X_LIST, DIR_SAVE_MAP_DATA, SAVE_FILE_NAME_PEAK_HEIGHT, True)
+peak_height_data_list = collect_all_image_file(PEAK_HEIGHT_DIRECTORY)
+generate_normalized_peak_height(peak_height_data_list, SAMPLE_X_LIST, DIR_SAVE_MAP_DATA, SAVE_FILE_NAME_PEAK_HEIGHT, False)
 
-# peak_shape_data_list = collect_all_image_file(PEAK_SHAPE_DIRECTORY)
-# generate_normalized_peak_shape(peak_shape_data_list, SAMPLE_X_LIST, DIR_SAVE_MAP_DATA, SAVE_FILE_NAME_PEAK_SHAPE, True)
+peak_shape_data_list = collect_all_image_file(PEAK_SHAPE_DIRECTORY)
+generate_normalized_peak_shape(peak_shape_data_list, SAMPLE_X_LIST, DIR_SAVE_MAP_DATA, SAVE_FILE_NAME_PEAK_SHAPE, False)
 
 out_shape_data_list = collect_all_image_file(OUT_SHAPE_DIRECTORY)
-generate_normalized_out_shape(out_shape_data_list, SAMPLE_X_LIST, DIR_SAVE_MAP_DATA, SAVE_FILE_NAME_OUT_SHAPE)
-
-# TODO: add drop shape process code
+generate_normalized_out_shape(out_shape_data_list, SAMPLE_X_LIST, DIR_SAVE_MAP_DATA, SAVE_FILE_NAME_OUT_SHAPE, False)
