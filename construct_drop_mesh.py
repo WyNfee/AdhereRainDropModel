@@ -77,6 +77,15 @@ def _abstract_sample_data(x_data, y_data, p_height_data, p_shape_data,
             abstracted_data[idx, :, 1] = axis_1
             abstracted_data[idx, :, 2] = axis_2
 
+    min_x = np.min(abstracted_data[:, :, 0])
+    min_y = np.min(abstracted_data[:, :, 1])
+    min_z = np.min(abstracted_data[:, :, 2])
+
+    # transform the mesh data along axis, make all data start from 0
+    abstracted_data[:, :, 0] = abstracted_data[:, :, 0] - min_x
+    abstracted_data[:, :, 1] = abstracted_data[:, :, 1] - min_y
+    abstracted_data[:, :, 2] = abstracted_data[:, :, 2] - min_z
+
     if enable_debugging is True:
         fig = plt.figure()
         ax = fig.gca(projection='3d')
@@ -206,14 +215,13 @@ def load_sample_data(shape_x, shape_y, peak_height, peak_shape):
     return x_data, y_data, p_height_data, p_shape_data
 
 
+"""
 data_x, data_y, data_ph, data_ps = load_sample_data(FILE_OUT_SHAPE_X, FILE_OUT_SHAPE_Y, FILE_PEAK_HEIGHT, FILE_PEAK_SHAPE)
 selected_index = _random_generate_pick_index(data_x)
 model_data = _abstract_sample_data(data_x[selected_index], data_y[selected_index], data_ph[selected_index], data_ps[selected_index],
                                    40, 80, 12, 0.1,
-                                   enable_debugging=False)
+                                   enable_debugging=True)
 # this operation is really time consuming!!!
 normal_data = compute_normal_based_on_mesh(model_data, enable_debugging=True)
-
-
-
 print("complete!")
+"""
