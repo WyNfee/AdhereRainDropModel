@@ -49,7 +49,7 @@ def _abstract_sample_data(x_data, y_data, p_height_data, p_shape_data,
     :param height: the actual height on pixel of the data to generate
     :param shape_offset: the shape offset (of percentage to long)
     :param enable_debugging: whether enable the data to preview
-    :return:
+    :return: the model mesh
     """
 
     sample_strength = p_height_data.shape[0]
@@ -77,11 +77,11 @@ def _abstract_sample_data(x_data, y_data, p_height_data, p_shape_data,
             abstracted_data[idx, :, 1] = axis_1
             abstracted_data[idx, :, 2] = axis_2
 
+    # transform the mesh data along axis, make all data start from 0
     min_x = np.min(abstracted_data[:, :, 0])
     min_y = np.min(abstracted_data[:, :, 1])
     min_z = np.min(abstracted_data[:, :, 2])
 
-    # transform the mesh data along axis, make all data start from 0
     abstracted_data[:, :, 0] = abstracted_data[:, :, 0] - min_x
     abstracted_data[:, :, 1] = abstracted_data[:, :, 1] - min_y
     abstracted_data[:, :, 2] = abstracted_data[:, :, 2] - min_z
@@ -130,29 +130,35 @@ def _compute_normal(mesh_data, current_h_idx, current_w_idx):
     :param current_w_idx: current mesh index on x axix (assuming z is for height)
     :return: the normal compute out
     """
+    # get the point from upper, bottom, left and right
     current_pt = mesh_data[current_h_idx][current_w_idx]
     left_pt = mesh_data[current_h_idx][current_w_idx - 1]
     right_pt = mesh_data[current_h_idx][current_w_idx + 1]
     bottom_pt = mesh_data[current_h_idx + 1][current_w_idx]
     up_pt = mesh_data[current_h_idx - 1][current_w_idx]
 
+    # compute the vector to these points
     left_vector = current_pt - left_pt
     right_vector = right_pt - current_pt
     up_vector = current_pt - up_pt
     bottom_vector = bottom_pt - current_pt
 
+    # compute the normal using cross product
     left_up_normal = np.cross(left_vector, up_vector)
     left_bottom_normal = np.cross(left_vector, bottom_vector)
     right_up_normal = np.cross(right_vector, up_vector)
     right_bottom_normal = np.cross(right_vector, bottom_vector)
 
+    # do normalize
     left_up_normal = _normalize_vector(left_up_normal)
     left_bottom_normal = _normalize_vector(left_bottom_normal)
     right_up_normal = _normalize_vector(right_up_normal)
     right_bottom_normal = _normalize_vector(right_bottom_normal)
 
+    # add these normal at four direction and average, more precise on normal
     final_normal = (left_up_normal + left_bottom_normal + right_up_normal + right_bottom_normal) / 4
 
+    # normalize the vector again
     final_normal = _normalize_vector(final_normal)
 
     return final_normal
@@ -172,11 +178,13 @@ def compute_normal_based_on_mesh(mesh, enable_debugging=False):
 
     for h_idx in range(height):
         for w_idx in range(width):
+            # the boundary item will not use to compute normal
             if 0 < h_idx < height-1 and 0 < w_idx < width-1:
                 norm = _compute_normal(mesh, h_idx, w_idx)
                 normal_data[h_idx][w_idx] = norm
 
     if enable_debugging is True:
+        # NOTE: the magic number is arbitrary set here, just for debug purpose
         fig = plt.figure()
         ax = fig.gca(projection='3d')
         ax.set_title("rain drop Mesh - 3D")
