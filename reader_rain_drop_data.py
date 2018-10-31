@@ -481,7 +481,6 @@ def generate_normalized_out_shape(data_list, sample_list, save_dir, save_file_na
     shape_data = np.zeros([data_amount, sample_amount * 2, 2])
 
     for idx, data in enumerate(data_list):
-        # TODO: extract the category name
         category_name = _extract_category_from_name(data.NAME)
         data_point_list = _extract_single_data(data.PATH, sample_area=1)
         arranged_point_list = _arrange_data_points(data_point_list, form='cycle')
@@ -494,7 +493,7 @@ def generate_normalized_out_shape(data_list, sample_list, save_dir, save_file_na
         sampled_whole_cycle_points = _combine_upper_and_bottom_together(sampled_upper_control_points, sampled_bottom_control_points)
 
         shape_data[idx, :sample_amount * 2 - 1, :] = sampled_whole_cycle_points
-        shape_data[idx, sample_amount, 0] = category_name
+        shape_data[idx, sample_amount * 2 - 1, 0] = category_name
 
         if enable_debugging:
             _plot_shape_cubic_curve(sampled_whole_cycle_points)
@@ -510,3 +509,5 @@ generate_normalized_peak_shape(peak_shape_data_list, SAMPLE_X_LIST, DIR_SAVE_MAP
 
 out_shape_data_list = collect_all_image_file(OUT_SHAPE_DIRECTORY)
 generate_normalized_out_shape(out_shape_data_list, SAMPLE_X_LIST, DIR_SAVE_MAP_DATA, SAVE_FILE_NAME_OUT_SHAPE, False)
+
+print("complete!")
