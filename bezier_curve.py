@@ -161,6 +161,34 @@ def generate_bezier_curve(control_points, incremental=0.001):
     return points_x_list, points_y_list
 
 
+def sample_bezier_curve(control_points, sample_strength):
+    """
+    generate the bezier curve according to control points
+    :param control_points: the control points of bezier curve, 1st is start point, last is
+    :param sample_strength: the sample strength of current curve
+    :return: points of bezier curves, normal of bezier curves
+    """
+    points_x_list = list()
+    points_y_list = list()
+
+    xs = np.linspace(0, 1, sample_strength)
+
+    if len(control_points) == 3:
+        bezier_func = _quadratic_bezier_point
+    elif len(control_points) == 4:
+        bezier_func = _cubic_bezier_point
+    else:
+        bezier_func = _generic_bezier_curve
+
+    # draw bezier curve
+    for x in xs:
+        o_x, o_y = bezier_func(x, control_points)
+        points_x_list.append(o_x)
+        points_y_list.append(o_y)
+
+    return points_x_list, points_y_list
+
+
 def compute_normal_positions(point_x_list, point_y_list, normal_x_list, normal_y_list):
 
     normal_vector_position = list()
