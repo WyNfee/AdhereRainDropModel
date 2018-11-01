@@ -12,16 +12,16 @@ import matplotlib.pyplot as plt
 
 
 # the curve control points data of out shape
-DROP_OUT_SHAPE_CONTROL_POINTS = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\saved\control_points\out_shape.npy"
+DROP_OUT_SHAPE_CONTROL_POINTS = r"C:\Users\Administrator\Documents\GitHub\AdhereRainDropModel\Data\saved\control_points\out_shape.npy"
 
 # the curve control points data of peak height
-DROP_PEAK_HEIGHT_CONTROL_POINTS = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\saved\control_points\peak_height.npy"
+DROP_PEAK_HEIGHT_CONTROL_POINTS = r"C:\Users\Administrator\Documents\GitHub\AdhereRainDropModel\Data\saved\control_points\peak_height.npy"
 
 # the curve control points data of peak shape
-DROP_PEAK_SHAPE_CONTROL_POINTS = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\saved\control_points\peak_shape.npy"
+DROP_PEAK_SHAPE_CONTROL_POINTS = r"C:\Users\Administrator\Documents\GitHub\AdhereRainDropModel\Data\saved\control_points\peak_shape.npy"
 
 # the save directory of collected points
-SAVE_DIR_OF_COLLECTED_POINTS = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\saved\sampled"
+SAVE_DIR_OF_COLLECTED_POINTS = r"C:\Users\Administrator\Documents\GitHub\AdhereRainDropModel\Data\saved\sampled"
 
 # save file name of out shape x points
 OUT_SHAPE_POINTS_X_FILE_NAME = "out_shape_x"

@@ -10,7 +10,7 @@ import numpy as np
 import construct_drop_mesh as mesh_builder
 import copy
 
-DEBUG_ROAD_IMAGE = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\real.jpg"
+DEBUG_ROAD_IMAGE = r"C:\Users\Administrator\Documents\GitHub\AdhereRainDropModel\Data\real.jpg"
 
 DEBUG_DROP_LOCATION = (400, 300)
 
@@ -27,6 +27,10 @@ WATER_DROP_SIZE_RANGE = (10, 300)
 WATER_DROP_SHAPE_OFFSET_RANGE = (0.1, 0.4)
 
 WATER_DROP_HEIGHT_RANGE = (5, 20)
+
+WATER_DROP_LOCATION_X = (0, 800)
+
+WATER_DROP_LOCATION_Y = (0, 400)
 
 
 def read_processing_image(image_file_path):
@@ -82,11 +86,13 @@ def project_drop_model_to_image_space(mesh_data, normal):
     return project_data
 
 
-def create_rain_drop_on_image(input_image, reference_image, projected_normal_data, drop_location, blend_range):
+def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_image, projected_normal_data, drop_location, blend_range):
     """
     using the projected normal and reference image,
     to draw the water drop effect on image we interested in.
-    :param input_image: the image we are working on
+    :param output_image: the image to output
+    :param drop_mask: the drop mask to work on
+    :param input_image: the source image we are working on
     :param reference_image: the reference image to simulate the distortion and focus causing by light refraction/reflection and camera projection/distortion
     :param projected_normal_data: the normal data projected on image index form
     :param drop_location: the location where to draw the drop
@@ -102,8 +108,6 @@ def create_rain_drop_on_image(input_image, reference_image, projected_normal_dat
     # the projected normal shape
     height = projected_normal_data.shape[0]
     width = projected_normal_data.shape[1]
-
-    water_drop_mask = np.zeros([water_drop_paste_height, water_drop_paste_width])
 
     max_pixel_loc_x = 0
     min_pixel_loc_x = width
@@ -157,14 +161,14 @@ def create_rain_drop_on_image(input_image, reference_image, projected_normal_dat
                 normal_z = projected_normal_data[h][w][2]
 
                 # using normal z as factor, to measure how to blend source image and reference image
-                blend_factor = random.uniform(BLEND_FACTOR_RANGE)
+                blend_factor = random.uniform(blend_range[0], blend_range[1])
                 translate_factor = normal_z * blend_factor
 
                 drop_pixel = current_value * translate_factor + (1 - translate_factor) * reference_value
 
                 # apply the drop pixel and record the mask of the image
                 water_drop_paste[pixel_loc_y][pixel_loc_x] = drop_pixel
-                water_drop_mask[pixel_loc_y][pixel_loc_x] = 1
+                drop_mask[pixel_loc_y][pixel_loc_x] = 1
 
     # create a gaussian blurry image, to reduce the edge sharpen
     gbk = int(random.uniform(BOUNDARY_BLUR_KERNEL_RANGE[0], BOUNDARY_BLUR_KERNEL_RANGE[1])) * 2 + 1
@@ -214,21 +218,25 @@ def create_rain_drop_on_image(input_image, reference_image, projected_normal_dat
 
             fill_value = reference_value * mask_filter_value + (1 - mask_filter_value) * current_value
 
-            input_image[h][w] = fill_value
+            output_image[h][w] = fill_value
 
-    return input_image, water_drop_mask
+    return output_image, drop_mask
 
 
-def create_water_drops_on_image(image_data, reference_image, data_x, data_y, data_ph, data_ps):
-    water_drop_amount = int(random.uniform(WATER_DROP_AMOUNT_RANGE))
-
+def create_water_drops_on_image(output_image, drop_mask, image_data, reference_image, data_x, data_y, data_ph, data_ps):
+    water_drop_amount = int(random.uniform(WATER_DROP_AMOUNT_RANGE[0], WATER_DROP_AMOUNT_RANGE[1]))
+    water_drop_amount = 2
+    print("Generating %d drops on image" % water_drop_amount)
     water_drop_idx = 0
 
     while water_drop_idx < water_drop_amount:
-        water_drop_size_x = int(random.uniform(WATER_DROP_SIZE_RANGE))
-        water_drop_size_y = int(random.uniform(WATER_DROP_SIZE_RANGE))
-        water_drop_height = int(random.uniform(WATER_DROP_HEIGHT_RANGE))
-        water_drop_shape = random.uniform(WATER_DROP_SHAPE_OFFSET_RANGE)
+        water_drop_size_x = int(random.uniform(WATER_DROP_SIZE_RANGE[0], WATER_DROP_SIZE_RANGE[1]))
+        water_drop_size_y = int(random.uniform(WATER_DROP_SIZE_RANGE[0], WATER_DROP_SIZE_RANGE[1]))
+        water_drop_height = int(random.uniform(WATER_DROP_HEIGHT_RANGE[0], WATER_DROP_HEIGHT_RANGE[1]))
+        water_drop_shape = random.uniform(WATER_DROP_SHAPE_OFFSET_RANGE[0], WATER_DROP_SHAPE_OFFSET_RANGE[1])
+        blend_range = BLEND_FACTOR_RANGE
+        water_drop_loc_x = int(random.uniform(WATER_DROP_LOCATION_X[0], WATER_DROP_LOCATION_X[1]))
+        water_drop_loc_y = int(random.uniform(WATER_DROP_LOCATION_Y[0], WATER_DROP_LOCATION_Y[1]))
 
         selected_index = mesh_builder._random_generate_pick_index(data_x)
         model_data = mesh_builder._abstract_sample_data(data_x[selected_index], data_y[selected_index], data_ph[selected_index], data_ps[selected_index],
@@ -236,9 +244,31 @@ def create_water_drops_on_image(image_data, reference_image, data_x, data_y, dat
                                                         enable_debugging=False)
         normal_data = mesh_builder.compute_normal_based_on_mesh(model_data, enable_debugging=False)
         project_normal = project_drop_model_to_image_space(model_data, normal_data)
-        output_image, mask_image = create_rain_drop_on_image(image_data, reference_image, project_normal, DEBUG_DROP_LOCATION)
+        output_image, drop_mask = create_rain_drop_on_image(output_image, drop_mask,
+                                                            image_data, reference_image, project_normal,
+                                                            (water_drop_loc_y, water_drop_loc_x), blend_range)
 
         water_drop_idx += 1
+        print("Drop %d has been generated" % water_drop_idx)
 
-    return output_image, mask_image
+    return output_image, drop_mask
 
+
+def generate_image_with_water_drop(image_file_path):
+    data_x, data_y, data_ph, data_ps = mesh_builder.load_sample_data(
+        mesh_builder.FILE_OUT_SHAPE_X, mesh_builder.FILE_OUT_SHAPE_Y,
+        mesh_builder.FILE_PEAK_HEIGHT, mesh_builder.FILE_PEAK_SHAPE)
+
+    origin_image, ref_image = read_processing_image(image_file_path)
+    output_image = copy.deepcopy(origin_image)
+    drop_mask = np.zeros([output_image.shape[0], output_image.shape[1]])
+    output_image, drop_mask = create_water_drops_on_image(output_image, drop_mask, origin_image, ref_image, data_x, data_y, data_ph, data_ps)
+
+    cv2.imshow('out_image', output_image)
+    cv2.imshow('mask', drop_mask)
+    cv2.waitKey(-1)
+
+    return output_image, drop_mask
+
+
+generate_image_with_water_drop(DEBUG_ROAD_IMAGE)

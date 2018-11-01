@@ -11,16 +11,16 @@ import bezier_curve as bezier
 from mpl_toolkits.mplot3d import Axes3D
 
 # the out shape x sample point file
-FILE_OUT_SHAPE_X = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\saved\sampled\out_shape_x.npy"
+FILE_OUT_SHAPE_X = r"C:\Users\Administrator\Documents\GitHub\AdhereRainDropModel\Data\saved\sampled\out_shape_x.npy"
 
 # the out shape y sample point file
-FILE_OUT_SHAPE_Y = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\saved\sampled\out_shape_y.npy"
+FILE_OUT_SHAPE_Y = r"C:\Users\Administrator\Documents\GitHub\AdhereRainDropModel\Data\saved\sampled\out_shape_y.npy"
 
 # the out shape y sample point file
-FILE_PEAK_SHAPE = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\saved\sampled\peak_shape.npy"
+FILE_PEAK_SHAPE = r"C:\Users\Administrator\Documents\GitHub\AdhereRainDropModel\Data\saved\sampled\peak_shape.npy"
 
 # the out shape y sample point file
-FILE_PEAK_HEIGHT = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\saved\sampled\peak_height.npy"
+FILE_PEAK_HEIGHT = r"C:\Users\Administrator\Documents\GitHub\AdhereRainDropModel\Data\saved\sampled\peak_height.npy"
 
 
 def _random_generate_pick_index(data):

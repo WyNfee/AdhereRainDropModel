@@ -15,16 +15,16 @@ Point = namedtuple("Point", ["X", "Y"])
 FileProperty = namedtuple("FileProperty", ["PATH", "NAME"])
 
 # height peak map directory
-PEAK_HEIGHT_DIRECTORY = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\height"
+PEAK_HEIGHT_DIRECTORY = r"C:\Users\Administrator\Documents\GitHub\AdhereRainDropModel\Data\height"
 
 # shape peak map directory
-PEAK_SHAPE_DIRECTORY = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\peakshape"
+PEAK_SHAPE_DIRECTORY = r"C:\Users\Administrator\Documents\GitHub\AdhereRainDropModel\Data\peakshape"
 
 # shape out map directory
-OUT_SHAPE_DIRECTORY = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\outshape"
+OUT_SHAPE_DIRECTORY = r"C:\Users\Administrator\Documents\GitHub\AdhereRainDropModel\Data\outshape"
 
 # save read data location
-DIR_SAVE_MAP_DATA = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\Data\saved"
+DIR_SAVE_MAP_DATA = r"C:\Users\Administrator\Documents\GitHub\AdhereRainDropModel\Data\saved\control_points"
 
 # saved file name of peak height
 SAVE_FILE_NAME_PEAK_HEIGHT = "peak_height"
