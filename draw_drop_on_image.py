@@ -16,9 +16,9 @@ DEBUG_DROP_LOCATION = (400, 300)
 
 BACKGROUND_BLUR_KERNEL_RANGE = (20, 50)
 
-BOUNDARY_BLUR_KERNEL_RANGE = (10, 40)
+BOUNDARY_BLUR_KERNEL_RANGE = (8, 20)
 
-BLEND_FACTOR_RANGE = (0.2, 0.8)
+BLEND_FACTOR_RANGE = (0.2, 0.5)
 
 WATER_DROP_AMOUNT_RANGE = (3, 10)
 
@@ -109,11 +109,14 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
     height = projected_normal_data.shape[0]
     width = projected_normal_data.shape[1]
 
+    print("project height %d, width %d" % (height, width))
+
+    print("drop location y %d, x %d" % (drop_location[0], drop_location[1]))
     max_pixel_loc_x = 0
-    min_pixel_loc_x = width
+    min_pixel_loc_x = water_drop_paste_width
 
     max_pixel_loc_y = 0
-    min_pixel_loc_y = height
+    min_pixel_loc_y = water_drop_paste_height
 
     # loop on projected normal data, using the normal data to map the reference image, shows on water drop refraction
     for h in range(height):
@@ -124,6 +127,12 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
                 # get where the pixel on image we need to draw
                 pixel_loc_x = int(drop_location[1]) + w
                 pixel_loc_y = int(drop_location[0]) + h
+
+                if pixel_loc_x >= water_drop_paste_width:
+                    continue
+
+                if pixel_loc_y >= water_drop_paste_height:
+                    continue
 
                 # boundary protection
                 if pixel_loc_x < min_pixel_loc_x:
@@ -172,7 +181,11 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
 
     # create a gaussian blurry image, to reduce the edge sharpen
     gbk = int(random.uniform(BOUNDARY_BLUR_KERNEL_RANGE[0], BOUNDARY_BLUR_KERNEL_RANGE[1])) * 2 + 1
+    print("edge blur param is %d" % gbk)
     water_drop_paste = cv2.GaussianBlur(water_drop_paste, (gbk, gbk), 0)
+
+    print("min y %d, min x %d" % (min_pixel_loc_y, min_pixel_loc_x))
+    print("max y %d, max x %d" % (max_pixel_loc_y, max_pixel_loc_x))
 
     # create a filtering matrix, a pyramid like, the edge is close to 0,
     # and center is close to 1, as a blend mask
@@ -218,14 +231,13 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
 
             fill_value = reference_value * mask_filter_value + (1 - mask_filter_value) * current_value
 
-            output_image[h][w] = fill_value
+            output_image[h][w] = fill_value  # (int(255 * mask_filter_value), 0, int(255 * mask_filter_value)) # for debug
 
     return output_image, drop_mask
 
 
 def create_water_drops_on_image(output_image, drop_mask, image_data, reference_image, data_x, data_y, data_ph, data_ps):
     water_drop_amount = int(random.uniform(WATER_DROP_AMOUNT_RANGE[0], WATER_DROP_AMOUNT_RANGE[1]))
-    water_drop_amount = 2
     print("Generating %d drops on image" % water_drop_amount)
     water_drop_idx = 0
 
@@ -240,7 +252,7 @@ def create_water_drops_on_image(output_image, drop_mask, image_data, reference_i
 
         selected_index = mesh_builder._random_generate_pick_index(data_x)
         model_data = mesh_builder._abstract_sample_data(data_x[selected_index], data_y[selected_index], data_ph[selected_index], data_ps[selected_index],
-                                                        water_drop_size_x, water_drop_size_y, water_drop_height, water_drop_shape,
+                                                        water_drop_size_y, water_drop_size_x, water_drop_height, water_drop_shape,
                                                         enable_debugging=False)
         normal_data = mesh_builder.compute_normal_based_on_mesh(model_data, enable_debugging=False)
         project_normal = project_drop_model_to_image_space(model_data, normal_data)
@@ -271,4 +283,4 @@ def generate_image_with_water_drop(image_file_path):
     return output_image, drop_mask
 
 
-generate_image_with_water_drop(DEBUG_ROAD_IMAGE)
+generate_image_with_water_drop(r"D:\Data\TFTrain\AdhereRainDrop\Raw\A3_20170327_143611_408.bmp")
