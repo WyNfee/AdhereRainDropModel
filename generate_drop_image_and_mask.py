@@ -9,7 +9,10 @@ import os
 import draw_drop_on_image as drop_draw
 
 # the directory where to store the
-DIR_STORE_IMAGE_TO_OPERATE = ""
+DIR_STORE_IMAGE_TO_OPERATE = r"D:\Data\TFTrain\AdhereRainDrop\Raw"
+
+# the directory where to save the output file
+DIR_SAVE_IMAGE_GENERATED = r"D:\Data\TFTrain\AdhereRainDrop\Drop"
 
 
 all_list_files = os.listdir(DIR_STORE_IMAGE_TO_OPERATE)
@@ -24,7 +27,10 @@ for file in all_list_files:
 for idx, file in enumerate(image_file_list):
     drop_image, drop_mask = drop_draw.generate_image_with_water_drop(file)
 
-    cv2.imwrite("%d.jpg" % idx, drop_image)
-    cv2.imwrite("%d_mask.jpg" % idx, drop_mask)
+    image_file_path = os.path.join(DIR_SAVE_IMAGE_GENERATED, "%d.jpg" % idx)
+    mask_file_path = os.path.join(DIR_SAVE_IMAGE_GENERATED, "%d_mask.jpg" % idx)
+
+    cv2.imwrite(image_file_path, drop_image)
+    cv2.imwrite(mask_file_path, drop_mask)
 
     print("Processed %d image" % idx+1)

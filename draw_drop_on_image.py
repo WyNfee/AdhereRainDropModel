@@ -20,9 +20,9 @@ BOUNDARY_BLUR_KERNEL_RANGE = (8, 20)
 
 BLEND_FACTOR_RANGE = (0.2, 0.5)
 
-WATER_DROP_AMOUNT_RANGE = (3, 10)
+WATER_DROP_AMOUNT_RANGE = (2, 4)
 
-WATER_DROP_SIZE_RANGE = (10, 300)
+WATER_DROP_SIZE_RANGE = (10, 200)
 
 WATER_DROP_SHAPE_OFFSET_RANGE = (0.1, 0.4)
 
@@ -109,9 +109,9 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
     height = projected_normal_data.shape[0]
     width = projected_normal_data.shape[1]
 
-    print("project height %d, width %d" % (height, width))
+    # print("project height %d, width %d" % (height, width))
 
-    print("drop location y %d, x %d" % (drop_location[0], drop_location[1]))
+    # print("drop location y %d, x %d" % (drop_location[0], drop_location[1]))
     max_pixel_loc_x = 0
     min_pixel_loc_x = water_drop_paste_width
 
@@ -181,11 +181,11 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
 
     # create a gaussian blurry image, to reduce the edge sharpen
     gbk = int(random.uniform(BOUNDARY_BLUR_KERNEL_RANGE[0], BOUNDARY_BLUR_KERNEL_RANGE[1])) * 2 + 1
-    print("edge blur param is %d" % gbk)
+    # print("edge blur param is %d" % gbk)
     water_drop_paste = cv2.GaussianBlur(water_drop_paste, (gbk, gbk), 0)
 
-    print("min y %d, min x %d" % (min_pixel_loc_y, min_pixel_loc_x))
-    print("max y %d, max x %d" % (max_pixel_loc_y, max_pixel_loc_x))
+    # print("min y %d, min x %d" % (min_pixel_loc_y, min_pixel_loc_x))
+    # print("max y %d, max x %d" % (max_pixel_loc_y, max_pixel_loc_x))
 
     # create a filtering matrix, a pyramid like, the edge is close to 0,
     # and center is close to 1, as a blend mask
@@ -238,7 +238,7 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
 
 def create_water_drops_on_image(output_image, drop_mask, image_data, reference_image, data_x, data_y, data_ph, data_ps):
     water_drop_amount = int(random.uniform(WATER_DROP_AMOUNT_RANGE[0], WATER_DROP_AMOUNT_RANGE[1]))
-    print("Generating %d drops on image" % water_drop_amount)
+    # print("Generating %d drops on image" % water_drop_amount)
     water_drop_idx = 0
 
     while water_drop_idx < water_drop_amount:
@@ -261,7 +261,7 @@ def create_water_drops_on_image(output_image, drop_mask, image_data, reference_i
                                                             (water_drop_loc_y, water_drop_loc_x), blend_range)
 
         water_drop_idx += 1
-        print("Drop %d has been generated" % water_drop_idx)
+        # print("Drop %d has been generated" % water_drop_idx)
 
     return output_image, drop_mask
 
@@ -283,4 +283,4 @@ def generate_image_with_water_drop(image_file_path):
     return output_image, drop_mask
 
 
-generate_image_with_water_drop(r"D:\Data\TFTrain\AdhereRainDrop\Raw\A3_20170327_143611_408.bmp")
+# generate_image_with_water_drop(r"D:\Data\TFTrain\AdhereRainDrop\Raw\20171205_1419020827.bmp")
