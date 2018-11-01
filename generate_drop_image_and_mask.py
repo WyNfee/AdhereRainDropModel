@@ -6,7 +6,7 @@ Description: This script will be used to generate the water drop on image
 
 import cv2
 import os
-import draw_drop_on_image as drop_draw
+import Drop.draw_drop_on_image as drop_draw
 
 # the directory where to store the
 DIR_STORE_IMAGE_TO_OPERATE = r"D:\Data\TFTrain\AdhereRainDrop\Raw"

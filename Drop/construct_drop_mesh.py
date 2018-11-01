@@ -7,8 +7,7 @@ Description: This script will generate 3D mesh (including normal) according to s
 import numpy as np
 import random
 import matplotlib.pyplot as plt
-import bezier_curve as bezier
-from mpl_toolkits.mplot3d import Axes3D
+from Drop import bezier_curve as bezier
 
 # the out shape x sample point file
 FILE_OUT_SHAPE_X = r"C:\Users\Administrator\Documents\GitHub\AdhereRainDropModel\Data\saved\sampled\out_shape_x.npy"

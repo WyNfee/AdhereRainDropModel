@@ -51,6 +51,7 @@ Temporary Items
 #DO NOT need follwoing directory
 .idea
 __pycache__
+_Train
 
 # Custom Ignore
 # DO NOT NEED FOLLOWING DATA

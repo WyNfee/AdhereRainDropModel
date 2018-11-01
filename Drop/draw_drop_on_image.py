@@ -7,7 +7,7 @@ Description: Draw the water drop on image
 import cv2
 import random
 import numpy as np
-import construct_drop_mesh as mesh_builder
+from Drop import construct_drop_mesh as mesh_builder
 import copy
 
 DEBUG_ROAD_IMAGE = r"C:\Users\Administrator\Documents\GitHub\AdhereRainDropModel\Data\real.jpg"
