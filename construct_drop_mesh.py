@@ -127,7 +127,7 @@ def _compute_normal(mesh_data, current_h_idx, current_w_idx):
     compute the normal of a mesh point, by sample its adjacent other points
     :param mesh_data: mesh data to work on
     :param current_h_idx: current mesh index on y axis
-    :param current_w_idx: current mesh index on x axix (assuming z is for height)
+    :param current_w_idx: current mesh index on x axis (assuming z is for height)
     :return: the normal compute out
     """
     # get the point from upper, bottom, left and right
