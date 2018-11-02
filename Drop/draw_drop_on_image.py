@@ -172,14 +172,14 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
                 normal_z = abs(projected_normal_data[h][w][2])
 
                 # using normal z as factor, to measure how to blend source image and reference image
-                blend_factor = random.uniform(blend_range[0], blend_range[1])
+                # blend_factor = random.uniform(blend_range[0], blend_range[1])
 
                 # if z value is small, mean x or y is strong, then use reference value more
                 # other wise, use current value more
-                translate_factor = normal_z  # * blend_factor
+                # translate_factor = normal_z  # * blend_factor
 
                 # drop_pixel = current_value * translate_factor * 0.8 + (1 - translate_factor) * reference_value
-                drop_pixel = reference_value
+                drop_pixel = reference_value * normal_z + current_value * (1 - normal_z) * 0.3
 
                 # apply the drop pixel and record the mask of the image
                 water_drop_paste[pixel_loc_y][pixel_loc_x] = drop_pixel
@@ -293,11 +293,11 @@ def generate_image_with_water_drop(image_file_path):
     drop_mask = np.zeros([output_image.shape[0], output_image.shape[1]])
     output_image, drop_mask = create_water_drops_on_image(output_image, drop_mask, origin_image, ref_image, data_x, data_y, data_ph, data_ps)
 
-    # cv2.imshow('out_image', output_image)
-    # cv2.imshow('mask', drop_mask)
-    # cv2.waitKey(-1)
+    cv2.imshow('out_image', output_image)
+    cv2.imshow('mask', drop_mask)
+    cv2.waitKey(-1)
 
     return output_image, drop_mask
 
 
-# generate_image_with_water_drop(r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\_Raw\drop\2# .jpg")
+# generate_image_with_water_drop(r"D:\Data\TFTrain\AdhereRainDrop\Raw\20170202_1621570093.bmp")
