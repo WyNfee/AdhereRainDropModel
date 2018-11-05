@@ -435,6 +435,8 @@ def generate_normalized_peak_height(data_list, sample_list, save_dir, save_file_
         if enable_debugging:
             _plot_common_cubic_curve(sampled_control_points)
 
+        print("Peak Height Processing progress %d/%d" % (idx + 1, data_amount))
+
     np.save(save_file_path, peak_data)
 
 
@@ -467,6 +469,8 @@ def generate_normalized_peak_shape(data_list, sample_list, save_dir, save_file_n
         if enable_debugging:
             _plot_common_cubic_curve(sampled_control_points)
 
+        print("Peak Shape Processing progress %d/%d" % (idx + 1, data_amount))
+
     np.save(save_file_path, peak_data)
 
 
@@ -497,6 +501,8 @@ def generate_normalized_out_shape(data_list, sample_list, save_dir, save_file_na
 
         if enable_debugging:
             _plot_shape_cubic_curve(sampled_whole_cycle_points)
+
+        print("Out shape Processing progress %d/%d" % (idx + 1, data_amount))
 
     np.save(save_file_path, shape_data)
 
