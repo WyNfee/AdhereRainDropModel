@@ -26,7 +26,7 @@ WATER_DROP_HEIGHT_RANGE = (60, 100)
 
 WATER_DROP_LOCATION_X = (0, 1000)
 
-WATER_DROP_LOCATION_Y = (0, 600)
+WATER_DROP_LOCATION_Y = (0, 550)
 
 
 def read_processing_image(image_file_path):
@@ -39,7 +39,9 @@ def read_processing_image(image_file_path):
     :return: the numpy array of the image, and a reference image to process on
     """
     process_image = cv2.imread(image_file_path)
+    process_image = process_image[77:-3, :]
     reference_image = cv2.imread(image_file_path)
+    reference_image = reference_image[77:-3, :]
     gbk = int(random.uniform(BACKGROUND_BLUR_KERNEL_RANGE[0], BACKGROUND_BLUR_KERNEL_RANGE[1])) * 2 + 1
     print("reference kernel size %d" % gbk)
     reference_image = cv2.GaussianBlur(reference_image, (gbk, gbk), 0)
@@ -179,7 +181,7 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
                 # translate_factor = normal_z  # * blend_factor
 
                 # drop_pixel = current_value * translate_factor * 0.8 + (1 - translate_factor) * reference_value
-                drop_pixel = reference_value * normal_z + current_value * (1 - normal_z) * 0.3
+                drop_pixel = reference_value * normal_z + current_value * (1 - normal_z) * 0.5
 
                 # apply the drop pixel and record the mask of the image
                 water_drop_paste[pixel_loc_y][pixel_loc_x] = drop_pixel
@@ -293,9 +295,9 @@ def generate_image_with_water_drop(image_file_path):
     drop_mask = np.zeros([output_image.shape[0], output_image.shape[1]])
     output_image, drop_mask = create_water_drops_on_image(output_image, drop_mask, origin_image, ref_image, data_x, data_y, data_ph, data_ps)
 
-    cv2.imshow('out_image', output_image)
-    cv2.imshow('mask', drop_mask)
-    cv2.waitKey(-1)
+    # cv2.imshow('out_image', output_image)
+    # cv2.imshow('mask', drop_mask)
+    # cv2.waitKey(-1)
 
     return output_image, drop_mask
 
