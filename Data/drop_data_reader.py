@@ -19,15 +19,31 @@ def _read_and_decode(file_name_queue):
         }
     )
 
+    # first image data
+
     image_data = tf.decode_raw(features['image'], tf.uint8)
     image_data = tf.reshape(image_data, [160, 320, 3])
-    image_data = tf.cast(image_data, dtype=tf.float32)
 
+    summary_image_data = tf.expand_dims(image_data, axis=0)
+    tf.summary.image('InputImage', summary_image_data)
+
+    image_data = tf.cast(image_data, dtype=tf.float32)
     image_data = image_data - 128.0
+
+    # then mask data
 
     mask_data = tf.decode_raw(features['value'], tf.uint8)
     mask_data = tf.reshape(mask_data, [20, 40, 3])
     mask_data = mask_data[:, :, 0]
+
+    summary_mask_data = tf.expand_dims(mask_data, axis=-1)
+    summary_mask_data = tf.expand_dims(summary_mask_data, axis=0)
+    tf.summary.image('InputMask', summary_mask_data)
+
+    # only value > 128 will be consider as positive sample with label 1
+    # otherwise, after resize, some pixel may be < 128, we will treat them as negative
+    # though hard cutting off...
+    mask_data = tf.greater(mask_data, 128)
     mask_data = tf.cast(mask_data, dtype=tf.int32)
 
     return image_data, mask_data
