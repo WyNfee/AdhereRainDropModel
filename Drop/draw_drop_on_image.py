@@ -14,7 +14,7 @@ BACKGROUND_BLUR_KERNEL_RANGE = (2, 7)
 
 BOUNDARY_BLUR_KERNEL_RANGE = (8, 15)
 
-BLEND_FACTOR_RANGE = (0.2, 0.5)
+BLEND_RANGE = (0.2, 0.8)
 
 WATER_DROP_AMOUNT_RANGE = (1, 2)
 
@@ -126,13 +126,14 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
                 pixel_loc_x = int(drop_location[1]) + w
                 pixel_loc_y = int(drop_location[0]) + h
 
+                # do boundary protection
                 if pixel_loc_x >= water_drop_paste_width:
                     continue
 
                 if pixel_loc_y >= water_drop_paste_height:
                     continue
 
-                # boundary protection
+                # record the min and max position of drop created
                 if pixel_loc_x < min_pixel_loc_x:
                     min_pixel_loc_x = pixel_loc_x
 
@@ -174,14 +175,12 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
                 normal_z = abs(projected_normal_data[h][w][2])
 
                 # using normal z as factor, to measure how to blend source image and reference image
-                # blend_factor = random.uniform(blend_range[0], blend_range[1])
+                blend_factor = random.uniform(blend_range[0], blend_range[1])
 
                 # if z value is small, mean x or y is strong, then use reference value more
                 # other wise, use current value more
                 # translate_factor = normal_z  # * blend_factor
-
-                # drop_pixel = current_value * translate_factor * 0.8 + (1 - translate_factor) * reference_value
-                drop_pixel = reference_value * normal_z + current_value * (1 - normal_z) * 0.5
+                drop_pixel = reference_value * normal_z + current_value * (1 - normal_z) * blend_factor
 
                 # apply the drop pixel and record the mask of the image
                 water_drop_paste[pixel_loc_y][pixel_loc_x] = drop_pixel
@@ -223,6 +222,7 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
     half_max_height_index = int(max(range(fill_area_height)) / 2)
 
     # create the pyramid
+    # TODO: think about using Bi_Gaussian Distribution replace this pyramid
     for f_x_idx in range(fill_area_width):
         for f_y_idx in range(fill_area_height):
             x_factor = (half_max_width_index - abs(f_x_idx - half_max_width_index)) / half_max_width_index
@@ -238,13 +238,12 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
             if w < min_pixel_loc_x or w >= max_pixel_loc_x:
                 continue
 
+            # do blend for this
             current_value = input_image[h][w]
             reference_value = water_drop_paste[h][w]
             mask_filter_value = fill_area[h - min_pixel_loc_y][w - min_pixel_loc_x]
-            # mask_filter_value = np.sqrt(mask_filter_value)
 
             fill_value = reference_value * mask_filter_value + (1 - mask_filter_value) * current_value
-            # fill_value = reference_value
 
             output_image[h][w] = fill_value  # (int(255 * mask_filter_value), 0, int(255 * mask_filter_value)) # for debug
 
@@ -261,12 +260,12 @@ def create_water_drops_on_image(output_image, drop_mask, image_data, reference_i
         water_drop_size_y = int(random.uniform(WATER_DROP_SIZE_RANGE[0], WATER_DROP_SIZE_RANGE[1]))
 
         water_drop_height = int(random.uniform(WATER_DROP_HEIGHT_RANGE[0], WATER_DROP_HEIGHT_RANGE[1]))
-        print("drop height parameter %d" % water_drop_height)
 
         water_drop_shape = random.uniform(WATER_DROP_SHAPE_OFFSET_RANGE[0], WATER_DROP_SHAPE_OFFSET_RANGE[1])
-        blend_range = BLEND_FACTOR_RANGE
         water_drop_loc_x = int(random.uniform(WATER_DROP_LOCATION_X[0], WATER_DROP_LOCATION_X[1]))
         water_drop_loc_y = int(random.uniform(WATER_DROP_LOCATION_Y[0], WATER_DROP_LOCATION_Y[1]))
+
+        blend_range = BLEND_RANGE
 
         selected_index = mesh_builder._random_generate_pick_index(data_x)
         model_data = mesh_builder._abstract_sample_data(data_x[selected_index], data_y[selected_index], data_ph[selected_index], data_ps[selected_index],
