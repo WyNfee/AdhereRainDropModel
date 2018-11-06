@@ -10,11 +10,12 @@ import numpy as np
 import Drop.draw_drop_on_image as drop_draw
 
 # the directory where to store the
-DIR_STORE_IMAGE_TO_OPERATE = r"D:\Data\Raw\Vehicle_dayTime\Vehicle_dayTime_NewData\JPEGImages"
+DIR_STORE_IMAGE_TO_OPERATE = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\_Raw\image"
 
 # the directory where to save the output file
-DIR_SAVE_IMAGE_GENERATED = r"D:\Data\TFTrain\AdhereRainDrop\Drop"
+DIR_SAVE_IMAGE_GENERATED = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\_Raw\drop"
 
+ENABLE_DEBUGGING = True
 
 all_list_files = os.listdir(DIR_STORE_IMAGE_TO_OPERATE)
 
@@ -37,5 +38,10 @@ for idx, file in enumerate(image_file_list):
 
     cv2.imwrite(image_file_path, drop_image)
     cv2.imwrite(mask_file_path, drop_mask)
+
+    if ENABLE_DEBUGGING is True:
+        cv2.imshow("IMAGE", drop_image)
+        cv2.imshow("MASK", drop_mask)
+        cv2.waitKey(-1)
 
     print("Processed %d image" % (idx + 1))
