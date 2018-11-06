@@ -16,7 +16,7 @@ BOUNDARY_BLUR_KERNEL_RANGE = (8, 15)
 
 BLEND_RANGE = (0.2, 0.8)
 
-WATER_DROP_AMOUNT_RANGE = (1, 2)
+WATER_DROP_AMOUNT_RANGE = (1, 4)
 
 WATER_DROP_SIZE_RANGE = (100, 250)
 
@@ -27,6 +27,8 @@ WATER_DROP_HEIGHT_RANGE = (60, 100)
 WATER_DROP_LOCATION_X = (0, 1000)
 
 WATER_DROP_LOCATION_Y = (0, 550)
+
+DROP_MAX_TRIAL = 200
 
 
 def read_processing_image(image_file_path):
@@ -43,7 +45,7 @@ def read_processing_image(image_file_path):
     reference_image = cv2.imread(image_file_path)
     reference_image = reference_image[77:-3, :]
     gbk = int(random.uniform(BACKGROUND_BLUR_KERNEL_RANGE[0], BACKGROUND_BLUR_KERNEL_RANGE[1])) * 2 + 1
-    print("reference kernel size %d" % gbk)
+    # print("reference kernel size %d" % gbk)
     reference_image = cv2.GaussianBlur(reference_image, (gbk, gbk), 0)
     reference_image = np.flipud(reference_image)
     # reference_image = (reference_image * 0.8).astype(np.uint8)
@@ -188,7 +190,7 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
 
     # create a gaussian blurry image, to reduce the edge sharpen
     gbk = int(random.uniform(BOUNDARY_BLUR_KERNEL_RANGE[0], BOUNDARY_BLUR_KERNEL_RANGE[1])) * 2 + 1
-    print("boundary blur factor %d" % gbk)
+    # print("boundary blur factor %d" % gbk)
 
     water_drop_paste = cv2.GaussianBlur(water_drop_paste, (gbk, gbk), 0)
 
@@ -255,31 +257,70 @@ def create_water_drops_on_image(output_image, drop_mask, image_data, reference_i
     # print("Generating %d drops on image" % water_drop_amount)
     water_drop_idx = 0
 
+    water_drop_location_list = list()
+
+    print("About to generate %d drops on image" % water_drop_amount)
     while water_drop_idx < water_drop_amount:
-        water_drop_size_x = int(random.uniform(WATER_DROP_SIZE_RANGE[0], WATER_DROP_SIZE_RANGE[1]))
-        water_drop_size_y = int(random.uniform(WATER_DROP_SIZE_RANGE[0], WATER_DROP_SIZE_RANGE[1]))
+        is_valid_location = False
+        trial_counter = 0
+        while is_valid_location is False and trial_counter < DROP_MAX_TRIAL:
+            water_drop_size_x = int(random.uniform(WATER_DROP_SIZE_RANGE[0], WATER_DROP_SIZE_RANGE[1]))
+            water_drop_size_y = int(random.uniform(WATER_DROP_SIZE_RANGE[0], WATER_DROP_SIZE_RANGE[1]))
 
-        water_drop_height = int(random.uniform(WATER_DROP_HEIGHT_RANGE[0], WATER_DROP_HEIGHT_RANGE[1]))
+            water_drop_height = int(random.uniform(WATER_DROP_HEIGHT_RANGE[0], WATER_DROP_HEIGHT_RANGE[1]))
 
-        water_drop_shape = random.uniform(WATER_DROP_SHAPE_OFFSET_RANGE[0], WATER_DROP_SHAPE_OFFSET_RANGE[1])
-        water_drop_loc_x = int(random.uniform(WATER_DROP_LOCATION_X[0], WATER_DROP_LOCATION_X[1]))
-        water_drop_loc_y = int(random.uniform(WATER_DROP_LOCATION_Y[0], WATER_DROP_LOCATION_Y[1]))
+            water_drop_shape = random.uniform(WATER_DROP_SHAPE_OFFSET_RANGE[0], WATER_DROP_SHAPE_OFFSET_RANGE[1])
+            water_drop_loc_x = int(random.uniform(WATER_DROP_LOCATION_X[0], WATER_DROP_LOCATION_X[1]))
+            water_drop_loc_y = int(random.uniform(WATER_DROP_LOCATION_Y[0], WATER_DROP_LOCATION_Y[1]))
 
-        blend_range = BLEND_RANGE
+            # roughly estimate whether this place is occupied or not
+            drop_xmin = water_drop_loc_x
+            drop_ymin = water_drop_loc_y
+            drop_xmax = water_drop_loc_x + water_drop_size_x
+            drop_ymax = water_drop_loc_y + water_drop_size_y
 
-        selected_index = mesh_builder._random_generate_pick_index(data_x)
-        model_data = mesh_builder._abstract_sample_data(data_x[selected_index], data_y[selected_index], data_ph[selected_index], data_ps[selected_index],
-                                                        water_drop_size_y, water_drop_size_x, water_drop_height, water_drop_shape,
-                                                        enable_debugging=False)
+            if len(water_drop_location_list) == 0:
+                is_valid_location = True
+                water_drop_location_list.append((drop_xmin, drop_ymin, drop_xmax, drop_ymax))
+                break
+            else:
+                for loc in water_drop_location_list:
+                    loc_xmin = loc[0]
+                    loc_ymin = loc[1]
+                    loc_xmax = loc[2]
+                    loc_ymax = loc[3]
 
-        project_mesh = project_drop_model_to_image_space(model_data)
-        project_normal = mesh_builder.compute_normal_based_on_mesh(project_mesh, enable_debugging=False)
-        output_image, drop_mask = create_rain_drop_on_image(output_image, drop_mask,
-                                                            image_data, reference_image, project_normal,
-                                                            (water_drop_loc_y, water_drop_loc_x), blend_range)
+                    xmin = max([drop_xmin, loc_xmin])
+                    xmax = min([drop_xmax, loc_xmax])
+                    ymin = max([drop_ymin, loc_ymin])
+                    ymax = min([drop_ymax, loc_ymax])
 
-        water_drop_idx += 1
-        # print("Drop %d has been generated" % water_drop_idx)
+                    if xmax <= xmin or ymax <= ymin:
+                        is_valid_location = True
+                        water_drop_location_list.append((drop_xmin, drop_ymin, drop_xmax, drop_ymax))
+                        break
+
+            trial_counter += 1
+
+        if is_valid_location is True:
+            blend_range = BLEND_RANGE
+
+            selected_index = mesh_builder._random_generate_pick_index(data_x)
+            model_data = mesh_builder._abstract_sample_data(data_x[selected_index], data_y[selected_index], data_ph[selected_index], data_ps[selected_index],
+                                                            water_drop_size_y, water_drop_size_x, water_drop_height, water_drop_shape,
+                                                            enable_debugging=False)
+
+            project_mesh = project_drop_model_to_image_space(model_data)
+            project_normal = mesh_builder.compute_normal_based_on_mesh(project_mesh, enable_debugging=False)
+            output_image, drop_mask = create_rain_drop_on_image(output_image, drop_mask,
+                                                                image_data, reference_image, project_normal,
+                                                                (water_drop_loc_y, water_drop_loc_x), blend_range)
+
+            water_drop_idx += 1
+            print("Drop %d has been generated" % water_drop_idx)
+
+        """while is_valid_location is False and trial_counter < DROP_MAX_TRIAL"""
+    """while water_drop_idx < water_drop_amount:"""
 
     return output_image, drop_mask
 
