@@ -12,13 +12,13 @@ import copy
 
 BACKGROUND_BLUR_KERNEL_RANGE = (5, 15)
 
-BOUNDARY_BLUR_KERNEL_RANGE = (18, 50)
+BOUNDARY_BLUR_KERNEL_RANGE = (18, 25)
 
 BLEND_RANGE = (0.75, 0.95)
 
-WATER_DROP_AMOUNT_RANGE = (2, 5)
+WATER_DROP_AMOUNT_RANGE = (1, 5)
 
-WATER_DROP_SIZE_RANGE = (60, 100)
+WATER_DROP_SIZE_RANGE = (60, 300)
 
 WATER_DROP_SHAPE_OFFSET_RANGE = (0.4, 0.8)
 
@@ -251,10 +251,11 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
             current_value = input_image[h][w]
             reference_value = water_drop_paste[h][w]
             mask_filter_value = fill_area[h - min_pixel_loc_y][w - min_pixel_loc_x]
+            mask_filter_value = mask_filter_value ** 1.5
 
             fill_value = reference_value * mask_filter_value + (1 - mask_filter_value) * current_value
 
-            output_image[h][w] = fill_value  # (int(255 * mask_filter_value), 0, int(255 * mask_filter_value)) # for debug
+            output_image[h][w] = fill_value  # (int(255 * mask_filter_value), 0, int(255 * mask_filter_value))  # for debug
 
     return output_image, drop_mask
 
@@ -315,12 +316,14 @@ def create_water_drops_on_image(output_image, drop_mask, image_data, reference_i
         drop_x_center = (drop_xmax + drop_xmin) / 2
         drop_y_center = (drop_ymax + drop_ymin) / 2
         drop_side = max([water_drop_size_y, water_drop_size_x])
-        drop_side = drop_side * 3
+        drop_side = drop_side * 2
 
         drop_test_xmin = drop_x_center - drop_side / 2
         drop_test_xmax = drop_x_center + drop_side / 2
         drop_test_ymin = drop_y_center - drop_side / 2
         drop_test_ymax = drop_y_center + drop_side / 2
+
+        is_valid_trial = True
 
         if len(water_drop_location_list) == 0:
             water_drop_location_list.append((drop_xmin, drop_ymin, drop_xmax, drop_ymax))
@@ -339,7 +342,7 @@ def create_water_drops_on_image(output_image, drop_mask, image_data, reference_i
                 loc_x_center = (loc_xmin + loc_xmax) / 2
                 loc_y_center = (loc_ymin + loc_ymax) / 2
                 loc_side = max([loc_ymax - loc_ymin, loc_xmax - loc_xmin])
-                loc_side = loc_side * 3
+                loc_side = loc_side * 2
 
                 loc_test_xmin = loc_x_center - loc_side / 2
                 loc_test_xmax = loc_x_center + loc_side / 2
@@ -352,14 +355,18 @@ def create_water_drops_on_image(output_image, drop_mask, image_data, reference_i
                 ymax = min([drop_test_ymax, loc_test_ymax])
 
                 if xmax <= xmin and ymax <= ymin:
-                    water_drop_location_list.append((drop_xmin, drop_ymin, drop_xmax, drop_ymax))
-                    print("%.4f, %.4f, %.4f, %.4f" % (drop_xmin, drop_ymin, drop_xmax, drop_ymax))
-                    water_drop_parameter_list.append((water_drop_size_x, water_drop_size_y, water_drop_height, water_drop_shape, water_drop_loc_x, water_drop_loc_y))
-                    water_drop_idx += 1
-                    trial_counter += 1
                     continue
+                else:
+                    is_valid_trial = False
+                    break
 
-            trial_counter += 1
+        if is_valid_trial is True:
+            water_drop_location_list.append((drop_xmin, drop_ymin, drop_xmax, drop_ymax))
+            print("%.4f, %.4f, %.4f, %.4f" % (drop_xmin, drop_ymin, drop_xmax, drop_ymax))
+            water_drop_parameter_list.append((water_drop_size_x, water_drop_size_y, water_drop_height, water_drop_shape, water_drop_loc_x, water_drop_loc_y))
+            water_drop_idx += 1
+
+        trial_counter += 1
 
     print("Total will generate %d" % len(water_drop_parameter_list))
     for water_drop_idx, parameter in enumerate(water_drop_parameter_list):
