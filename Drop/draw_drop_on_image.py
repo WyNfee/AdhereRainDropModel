@@ -211,11 +211,11 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
     fill_area_height = max_pixel_loc_y - min_pixel_loc_y
     fill_area_width = max_pixel_loc_x - min_pixel_loc_x
 
-    min_pixel_loc_y = min_pixel_loc_y - int(fill_area_height / 2)
-    min_pixel_loc_x = min_pixel_loc_x - int(fill_area_width / 2)
+    min_pixel_loc_y = max([min_pixel_loc_y - int(fill_area_height / 2), 0])
+    min_pixel_loc_x = max([min_pixel_loc_x - int(fill_area_width / 2), 0])
 
-    max_pixel_loc_y = max_pixel_loc_y + int(fill_area_height / 2)
-    max_pixel_loc_x = max_pixel_loc_x + int(fill_area_width / 2)
+    max_pixel_loc_y = min([max_pixel_loc_y + int(fill_area_height / 2), water_drop_paste_height])
+    max_pixel_loc_x = min([max_pixel_loc_x + int(fill_area_width / 2), water_drop_paste_width])
 
     fill_area_height = max_pixel_loc_y - min_pixel_loc_y
     fill_area_width = max_pixel_loc_x - min_pixel_loc_x
@@ -225,9 +225,6 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
 
     if fill_area_width % 2 == 0:
         fill_area_width = fill_area_width + 1
-
-    fill_area_height = max([fill_area_height, 0])
-    fill_area_width = max([fill_area_width, 0])
 
     fill_area = np.zeros([fill_area_height, fill_area_width])
 
