@@ -10,10 +10,10 @@ import cv2
 import numpy as np
 
 # the directory where to find the json and image file pair
-DIR_LABELED_DATA = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\_Raw\real_drop"
+DIR_LABELED_DATA = r"D:\Maxieye_Data\RAIN\Data1_920\jpg_a"
 
 # the directory where to store the json file and image file
-DIR_SAVE_IMAGE_GENERATED = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\_Raw\drop"
+DIR_SAVE_IMAGE_GENERATED = r"D:\Maxieye_Data\RAIN\Data1_920\generated"
 
 # whether enable debugging plot
 ENABLE_DEBUGGING = False
@@ -54,6 +54,10 @@ def generate_mask_and_convert_image(working_dir, save_dir, image_safe_name, enab
 
     obj_list = json_data["ObjList"]
 
+    if obj_list is None:
+        print("[Error] something wrong at file %s" % image_safe_name)
+        return
+
     for obj in obj_list:
         points = obj["regionArr"][0]["region_borderPts"]
         points_list.append(points)
@@ -93,8 +97,10 @@ def generate_mask_and_convert_image(working_dir, save_dir, image_safe_name, enab
 
 
 valid_file_names = _find_valid_file_pair(DIR_LABELED_DATA)
-for valid_file in valid_file_names:
+all_data_amount = len(valid_file_names)
+for idx, valid_file in enumerate(valid_file_names):
     generate_mask_and_convert_image(DIR_LABELED_DATA, DIR_SAVE_IMAGE_GENERATED, valid_file)
+    print("Progress %d/%d" % (idx+1, all_data_amount))
 
 
 # Debugging Function
