@@ -8,6 +8,7 @@ import os
 import cv2
 import numpy as np
 import tensorflow as tf
+import random
 
 
 # the directory of drop data to read
@@ -75,6 +76,7 @@ def preprocess_non_drop_data(non_drop_data):
     image_path = non_drop_data + '.jpg'
 
     image_data = cv2.imread(image_path)
+    image_data = image_data[77:-3, :]
     mask_data = np.zeros_like(image_data)
 
     input_image_data = cv2.resize(image_data, (320, 160))
@@ -89,7 +91,7 @@ def preprocess_non_drop_data(non_drop_data):
 
 
 def generate_tfrecords(drop_data_dir, non_drop_data_dir, output_file):
-    drop_data_path_list = list() #read_the_drop_data(drop_data_dir)
+    drop_data_path_list = read_the_drop_data(drop_data_dir)
     non_drop_data_list = read_the_non_drop_data(non_drop_data_dir)
 
     data_path_list = list()
@@ -99,6 +101,10 @@ def generate_tfrecords(drop_data_dir, non_drop_data_dir, output_file):
 
     for dp in non_drop_data_list:
         data_path_list.append([dp, False])
+
+    # shuffle twice to make sure the data inside is randomized
+    random.shuffle(data_path_list)
+    random.shuffle(data_path_list)
 
     writer = tf.python_io.TFRecordWriter(output_file)
 
