@@ -12,16 +12,16 @@ from Model import drop_net as net
 import copy
 
 # the file path of srpn weights
-WEIGHT_FILE = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\_Train\save\test"
+WEIGHT_FILE = r"D:\Data\TFTrain\AdhereRainDrop\Save\test"
 
 # the directory where store the demo image
-DIR_DEMO_IMAGE = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\_Raw\drop"
+DIR_DEMO_IMAGE = r"D:\Data\Raw\RainingLog\jpg"
 
 # selection threshold of srpn network
-SELECTION_THRESHOLD = 0.5
+SELECTION_THRESHOLD = 0.97
 
 # CPU only mode
-CPU_ONLY_MODE = True
+CPU_ONLY_MODE = False
 
 
 def drop_net_detection(image_data):
@@ -75,7 +75,7 @@ def main():
         drop_map_data = drop_map[0, :, :] * 255
         drop_map_data = drop_map_data.astype(np.uint8)
 
-        resize_drop_map = cv2.resize(drop_map_data, (1280, 640))
+        resize_drop_map = cv2.resize(drop_map_data, (320, 160))
 
         cv2.imshow('orig_image', orig_image)
         cv2.imshow('drop_data', resize_drop_map)
