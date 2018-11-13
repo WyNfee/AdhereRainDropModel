@@ -14,7 +14,7 @@ def _def_arg_scope(weight_decay=5e-4, is_training=True):
                          'updates_collections': tf.GraphKeys.UPDATE_OPS}
     with slim.arg_scope(
             [slim.conv2d, slim.fully_connected, slim.conv2d_transpose],
-            activation_fn=tf.nn.relu,
+            activation_fn=tf.nn.leaky_relu,
             weights_regularizer=slim.l2_regularizer(weight_decay),
             weights_initializer=tf.contrib.layers.xavier_initializer(),
             biases_initializer=tf.zeros_initializer(),
@@ -35,26 +35,26 @@ def get_net(input_data, weight_decay=5e-4, is_training=True):
     with slim.arg_scope(scope_def):
         with tf.variable_scope('drop_net', 'drop_net', [image], reuse=tf.AUTO_REUSE):
 
-            net = slim.repeat(image, 1, slim.conv2d, 16, [5, 5], scope='conv1')
+            net = slim.repeat(image, 1, slim.conv2d, 32, [5, 5], scope='conv1')
             net = slim.max_pool2d(net, [2, 2], scope='pool1')  # 80 160
 
-            net = slim.repeat(net, 1, slim.conv2d, 16, [5, 5], scope='conv2')
+            net = slim.repeat(net, 1, slim.conv2d, 32, [5, 5], scope='conv2')
             net = slim.max_pool2d(net, [2, 2], scope='pool2')  # 40 80
 
-            net = slim.repeat(net, 1, slim.conv2d, 32, [3, 3], scope='conv3')
+            net = slim.repeat(net, 1, slim.conv2d, 64, [3, 3], scope='conv3')
             net = slim.max_pool2d(net, [2, 2], scope='pool3')  # 20 40
             net3 = net
 
-            net = slim.repeat(net, 1, slim.conv2d, 32, [3, 3], scope='conv4')
+            net = slim.repeat(net, 1, slim.conv2d, 64, [3, 3], scope='conv4')
             net = slim.max_pool2d(net, [2, 2], scope='pool4')  # 10 20
             net4 = net
 
-            net = slim.repeat(net, 1, slim.conv2d, 32, [3, 3], scope='conv5')
+            net = slim.repeat(net, 1, slim.conv2d, 64, [3, 3], scope='conv5')
             net = slim.max_pool2d(net, [2, 2], scope='pool5')  # 5 10
 
-            net = slim.repeat(net, 1, slim.conv2d_transpose, 32, [3, 3], stride=2, scope='deconv5')
+            net = slim.repeat(net, 1, slim.conv2d_transpose, 64, [3, 3], stride=2, scope='deconv5')
             net = net + net4
-            net = slim.repeat(net, 1, slim.conv2d_transpose, 32, [3, 3], stride=2, scope='deconv4')
+            net = slim.repeat(net, 1, slim.conv2d_transpose, 64, [3, 3], stride=2, scope='deconv4')
             net = net + net3
 
             inputs_shape = net.get_shape()

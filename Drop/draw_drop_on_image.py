@@ -18,7 +18,7 @@ BLEND_RANGE = (0.75, 0.95)
 
 WATER_DROP_AMOUNT_RANGE = (1, 5)
 
-WATER_DROP_SIZE_RANGE = (60, 370)
+WATER_DROP_SIZE_RANGE = (120, 400)
 
 WATER_DROP_SHAPE_OFFSET_RANGE = (0.4, 0.8)
 
@@ -227,6 +227,9 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
         fill_area_width = fill_area_width + 1
 
     fill_area = np.zeros([fill_area_height, fill_area_width])
+
+    if fill_area_height <= 0 or fill_area_width <= 0:
+        return output_image, drop_mask
 
     half_max_width_index = int(max(range(fill_area_width)) / 2)
     half_max_height_index = int(max(range(fill_area_height)) / 2)

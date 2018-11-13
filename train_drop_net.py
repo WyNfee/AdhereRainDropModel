@@ -9,12 +9,12 @@ from Data import drop_data_reader as reader
 
 DATA_TFRECORD_FILE = r"D:\Data\TFTrain\AdhereRainDrop\Record\drop.tfrecords"
 
-TRAIN_BATCH_SIZE = 512
+TRAIN_BATCH_SIZE = 128
 TRAIN_INIT_LEARNING_RATE = 1e-3
-TRAIN_LEARNING_RATE_DECAY_STEP = 2500
+TRAIN_LEARNING_RATE_DECAY_STEP = 500
 # final learning rate = TRAIN_LEARNING_RATE * pow(0.95, TRAIN_ITERATE_STEPS / TRAIN_LEARNING_RATE_DECAY_STEP)
 TRAIN_LEARNING_RATE_DECAY_FACTOR = 0.95
-TRAIN_ITERATE_STEPS = 200001  # None means endless training
+TRAIN_ITERATE_STEPS = 20001  # None means endless training
 
 RESTORE_CHECKPOINT_FILE = None
 # None means everything will be restored
@@ -24,7 +24,7 @@ RESTORE_EXCLUDE_SCOPES = None  # None means nothing will be excluded when restor
 # None means everything is trainable
 RESTORE_TRAINABLE_SCOPES = None
 
-NEGATIVE_MAX_SAMPLE_AMOUNT_MULTIPLIER = 1.
+NEGATIVE_MAX_SAMPLE_AMOUNT_MULTIPLIER = 0.5
 
 OPTIMIZER_NAME = 'adam'  # adam, momentum supported
 OPTIMIZER_PARAMETERS = [0.9, 0.999, 1e-8]

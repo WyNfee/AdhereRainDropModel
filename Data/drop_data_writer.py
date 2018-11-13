@@ -12,16 +12,16 @@ import random
 
 
 # the directory of drop data to read
-DROP_DATA_DIR = r"H:\Maxieye_Data\RAIN\Data1_920\generated"
+DROP_DATA_DIR = r"H:\Maxieye_Data\RAIN\Data1_920\valid_drop"
 
 # the directory of non drop adhere data to read
-NON_DROP_DATA_DIR = r"H:\Maxieye_Data\RAIN\Data1_920\jpg_b"
+NON_DROP_DATA_DIR = r"H:\Maxieye_Data\RAIN\Data1_920\valid_no_drop"
 
 # the output file path
 OUTPUT_TFRECORD = r"D:\Data\TFTrain\AdhereRainDrop\Record\drop.tfrecords"
 
 # whether enable debugging
-ENABLE_DEBUGGING = True
+ENABLE_DEBUGGING = False
 
 
 def _bytes_feature(value):
@@ -32,11 +32,14 @@ def read_the_drop_data(drop_data_directory):
     file_list = os.listdir(drop_data_directory)
     drop_data_list = list()
 
+    strip_amount = len("_mask.jpg")
+
     for file in file_list:
         is_mask_data = file.find("_mask") != 0
-        has_base_data = os.path.exists(os.path.join(drop_data_directory, file.split(".")[0].split("_")[0] + ".jpg"))
+        file_safe_name = file[:-strip_amount]
+        has_base_data = os.path.exists(os.path.join(drop_data_directory, file_safe_name + ".jpg"))
         if is_mask_data is True and has_base_data is True:
-            file_path_to_store = os.path.join(drop_data_directory, file.split(".")[0].split("_")[0])
+            file_path_to_store = os.path.join(drop_data_directory,file_safe_name)
             drop_data_list.append(file_path_to_store)
 
     return drop_data_list

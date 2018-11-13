@@ -11,6 +11,9 @@ import numpy as np
 # the directory where to store the image and mask pair
 DIR_WORKING_DIR = r"H:\Maxieye_Data\RAIN\Data1_920\generated"
 
+# the directory where to store the valid image and mask pair
+DIR_VALID_DIR = r"H:\Maxieye_Data\RAIN\Data1_920\valid"
+
 
 def _find_valid_file_pair(working_dir):
     all_file_list = os.listdir(working_dir)
@@ -27,7 +30,7 @@ def _find_valid_file_pair(working_dir):
     return valid_file_list
 
 
-def _view_mask_and_image_file(working_dir, valid_file_list):
+def _view_mask_and_image_file(working_dir, valid_dir, valid_file_list):
     display_mode = 1
 
     for idx, valid_file in enumerate(valid_file_list):
@@ -46,7 +49,7 @@ def _view_mask_and_image_file(working_dir, valid_file_list):
 
         key = -1
 
-        while key != 32:  # space
+        while key != 32 and key != 115 and key != 83:  # space, s
 
             if key == 90 or key == 122:  # press z
                 display_mode = 1
@@ -67,8 +70,14 @@ def _view_mask_and_image_file(working_dir, valid_file_list):
             cv2.imshow("view_data", display_data)
             key = cv2.waitKey(-1)
 
+        if key == 115 or key == 83:
+            save_image_file_path = os.path.join(valid_dir, valid_file + ".jpg")
+            save_mask_file_path = os.path.join(valid_dir, valid_file + "_mask.jpg")
+            os.rename(image_file_path, save_image_file_path)
+            os.rename(mask_file_path, save_mask_file_path)
+
         print("Progress %d/%d" % (idx+1, len(valid_file_list)))
 
 
 valid_list = _find_valid_file_pair(DIR_WORKING_DIR)
-_view_mask_and_image_file(DIR_WORKING_DIR, valid_list)
+_view_mask_and_image_file(DIR_WORKING_DIR, DIR_VALID_DIR, valid_list)
