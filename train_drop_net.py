@@ -7,9 +7,9 @@ from Restorer import model_restorer
 from Model import drop_net
 from Data import drop_data_reader as reader
 
-DATA_TFRECORD_FILE = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\_Train\record\drop.tfrecords"
+DATA_TFRECORD_FILE = r"D:\Data\TFTrain\AdhereRainDrop\Record\drop.tfrecords"
 
-TRAIN_BATCH_SIZE = 8
+TRAIN_BATCH_SIZE = 512
 TRAIN_INIT_LEARNING_RATE = 1e-3
 TRAIN_LEARNING_RATE_DECAY_STEP = 2500
 # final learning rate = TRAIN_LEARNING_RATE * pow(0.95, TRAIN_ITERATE_STEPS / TRAIN_LEARNING_RATE_DECAY_STEP)
@@ -24,12 +24,14 @@ RESTORE_EXCLUDE_SCOPES = None  # None means nothing will be excluded when restor
 # None means everything is trainable
 RESTORE_TRAINABLE_SCOPES = None
 
+NEGATIVE_MAX_SAMPLE_AMOUNT_MULTIPLIER = 1.
+
 OPTIMIZER_NAME = 'adam'  # adam, momentum supported
 OPTIMIZER_PARAMETERS = [0.9, 0.999, 1e-8]
 
 
-EVENTS_DIR = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\_Train\save"
-LOG_SAVE_DIR = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\_Train\save"
+EVENTS_DIR = r"D:\Data\TFTrain\AdhereRainDrop\Save"
+LOG_SAVE_DIR = r"D:\Data\TFTrain\AdhereRainDrop\Save"
 LOG_SAVE_FILE_PATTERN = "DROP_DATA"
 
 
@@ -52,7 +54,7 @@ def main(_):
 
         negative_mask = tf.logical_not(positive_mask)
         negative_sample_amount = tf.reduce_sum(tf.cast(negative_mask, dtype=tf.int32))
-        negative_sample_planned_amount = tf.cast(3. * positive_sample_amount, dtype=tf.int32)
+        negative_sample_planned_amount = tf.cast(NEGATIVE_MAX_SAMPLE_AMOUNT_MULTIPLIER * positive_sample_amount, dtype=tf.int32)
         negative_sample_amount_if_no_positive = tf.div(negative_sample_amount, int(8))
         final_negative_sample_amount = tf.minimum(negative_sample_amount, negative_sample_planned_amount)
         final_negative_sample_amount = tf.maximum(final_negative_sample_amount, negative_sample_amount_if_no_positive)
