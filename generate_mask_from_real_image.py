@@ -15,6 +15,9 @@ DIR_LABELED_DATA = r"D:\Maxieye_Data\RAIN\Data1_920\jpg_a"
 # the directory where to store the json file and image file
 DIR_SAVE_IMAGE_GENERATED = r"D:\Maxieye_Data\RAIN\Data1_920\generated"
 
+# the directory where to store invalid files
+DIR_INVALID_FILES = r"D:\Maxieye_Data\RAIN\Data1_920\error"
+
 # whether enable debugging plot
 ENABLE_DEBUGGING = False
 
@@ -56,6 +59,10 @@ def generate_mask_and_convert_image(working_dir, save_dir, image_safe_name, enab
 
     if obj_list is None:
         print("[Error] something wrong at file %s" % image_safe_name)
+        image_error_image = os.path.join(DIR_INVALID_FILES, image_safe_name + ".jpg")
+        json_error_image = os.path.join(DIR_INVALID_FILES, image_safe_name + ".json")
+        os.rename(image_file_path, image_error_image)
+        os.rename(json_file_path, json_error_image)
         return
 
     for obj in obj_list:
