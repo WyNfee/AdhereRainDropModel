@@ -22,7 +22,7 @@ WATER_DROP_SIZE_RANGE = (120, 400)
 
 WATER_DROP_SHAPE_OFFSET_RANGE = (0.4, 0.8)
 
-WATER_DROP_HEIGHT_RANGE = (100, 600)
+WATER_DROP_HEIGHT_RANGE = (100, 800)
 
 WATER_DROP_LOCATION_X = (0, 1000)
 
@@ -194,7 +194,9 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
 
                 # apply the drop pixel and record the mask of the image
                 water_drop_paste[pixel_loc_y][pixel_loc_x] = drop_pixel
-                drop_mask[pixel_loc_y][pixel_loc_x] = 1
+
+                if normal_z > 0.2:
+                    drop_mask[pixel_loc_y][pixel_loc_x] = 1
 
     # create a gaussian blurry image, to reduce the edge sharpen
     gbk = int(random.uniform(BOUNDARY_BLUR_KERNEL_RANGE[0], BOUNDARY_BLUR_KERNEL_RANGE[1])) * 2 + 1
@@ -226,10 +228,11 @@ def create_rain_drop_on_image(output_image, drop_mask, input_image, reference_im
     if fill_area_width % 2 == 0:
         fill_area_width = fill_area_width + 1
 
-    fill_area = np.zeros([fill_area_height, fill_area_width])
-
-    if fill_area_height <= 0 or fill_area_width <= 0:
+    # if the item is less than 10x10 in pixels, discard it
+    if fill_area_height <= 10 or fill_area_width <= 10:
         return output_image, drop_mask
+
+    fill_area = np.zeros([fill_area_height, fill_area_width])
 
     half_max_width_index = int(max(range(fill_area_width)) / 2)
     half_max_height_index = int(max(range(fill_area_height)) / 2)

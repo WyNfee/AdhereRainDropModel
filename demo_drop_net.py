@@ -15,10 +15,10 @@ import copy
 WEIGHT_FILE = r"D:\Data\TFTrain\AdhereRainDrop\Save\test"
 
 # the directory where store the demo image
-DIR_DEMO_IMAGE = r"D:\Data\Raw\RainingLog\jpg"
+DIR_DEMO_IMAGE = r"D:\Data\TFTrain\AdhereRainDrop\T3"
 
 # selection threshold of srpn network
-SELECTION_THRESHOLD = 0.97
+SELECTION_THRESHOLD = 0.6
 
 # CPU only mode
 CPU_ONLY_MODE = False
@@ -38,17 +38,28 @@ def drop_net_detection(image_data):
         image_pre = image_cast - 128.0
         input_image = tf.expand_dims(image_pre, 0)
 
-        logits = net.get_net(input_image)
+        logits = net.get_net(input_image, is_training=False)
 
         predictions = tf.nn.softmax(logits)
         selection_map = tf.greater(predictions[:, :, :, 1], SELECTION_THRESHOLD)
-        selection = tf.cast(selection_map, dtype=tf.uint8)
+        selection_map = tf.expand_dims(tf.cast(selection_map, dtype=tf.float32), axis=-1)
+
+        filter_kernel = tf.ones((1, 1), dtype=tf.float32)
+        filter_kernel = tf.pad(filter_kernel, [[1, 1], [1, 1]], mode="CONSTANT", constant_values=1)
+        filter_kernel = tf.pad(filter_kernel, [[1, 1], [1, 1]], mode="CONSTANT", constant_values=0)
+        filter_kernel = filter_kernel / 8.
+        filter_kernel = tf.expand_dims(filter_kernel, axis=-1)
+        filter_kernel = tf.expand_dims(filter_kernel, axis=-1)
+        filtered_map = tf.nn.conv2d(selection_map, filter_kernel, strides=[1, 1, 1, 1], padding="SAME")
+        filtered_map = tf.greater_equal(filtered_map, 0.5)
+
+        selection = tf.cast(filtered_map, dtype=tf.uint8)
 
         session.run(tf.global_variables_initializer())
         saver = tf.train.Saver()
         saver.restore(session, WEIGHT_FILE)
 
-        select_drop_map = session.run(selection, feed_dict={input_tensor:image_data})
+        select_drop_map = session.run(selection, feed_dict={input_tensor: image_data})
 
         return select_drop_map
 
@@ -66,7 +77,7 @@ def main():
         if image_data is None:
             continue
 
-        image_data = image_data[80:, :]
+        image_data = image_data[77:-3, :]
         orig_image = copy.deepcopy(image_data)
         image_data = cv2.resize(image_data, (320, 160))
 

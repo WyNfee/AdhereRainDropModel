@@ -6,16 +6,21 @@ Description: This script will be used to generate the water drop on image
 
 import cv2
 import os
+import random
 import numpy as np
 import Drop.draw_drop_on_image as drop_draw
 
 # the directory where to store the
-DIR_STORE_IMAGE_TO_OPERATE = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\_Raw\image"
+DIR_STORE_IMAGE_TO_OPERATE = r"D:\Data\TFTrain\AdhereRainDrop\Data\valid_no_drop"
 
 # the directory where to save the output file
-DIR_SAVE_IMAGE_GENERATED = r"C:\Users\wangy\Documents\GitHub\AdhereRainDropModel\_Raw\drop"
+DIR_SAVE_IMAGE_GENERATED = r"D:\Data\TFTrain\AdhereRainDrop\Data\generated_drop"
 
-ENABLE_DEBUGGING = True
+# whether enable debugging for not
+ENABLE_DEBUGGING = False
+
+# the image list to be duplicated for generate fake image drop on windshield
+IMAGE_LIST_DUPLICATE_MULTIPLIER = 1.
 
 all_list_files = os.listdir(DIR_STORE_IMAGE_TO_OPERATE)
 
@@ -25,6 +30,9 @@ for file in all_list_files:
     if file.endswith(".bmp") is True or file.endswith(".jpg") is True:
         image_file_list.append(os.path.join(DIR_STORE_IMAGE_TO_OPERATE, file))
 
+image_file_list = image_file_list * IMAGE_LIST_DUPLICATE_MULTIPLIER
+random.shuffle(image_file_list)
+random.shuffle(image_file_list)
 
 for idx, file in enumerate(image_file_list):
     drop_image, drop_mask = drop_draw.generate_image_with_water_drop(file)
